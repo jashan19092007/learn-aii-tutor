@@ -50,7 +50,7 @@ export function validateCitations(citedIds: string[], evidence: Evidence[]) {
 }
 
 /** Rewinding must not leak later lecture answers through conversation history. */
-export function eligibleHistory<T extends { askedAt?: number }>(history: T[], askedAt: number): T[] {
+export function eligibleHistory<T extends { askedAt?: number | undefined }>(history: T[], askedAt: number): T[] {
   return history.filter((message) => message.askedAt !== undefined && Number.isFinite(message.askedAt) && message.askedAt <= askedAt);
 }
 
