@@ -14,3 +14,4 @@
 - AI citations are validated against the supplied evidence IDs (`validateCitations`) — prevents fabricated sources.
 - Study materials are always a separate source kind ("document") from video transcript — keeps citations distinguishable.
 - Model calls and document parsing run server-side only — keeps keys and heavy parsing off the client.
+- AI tutor calls go through `src/lib/tutor.functions.ts`, which re-runs `buildEvidence` server-side — the client's filtering is never trusted.
