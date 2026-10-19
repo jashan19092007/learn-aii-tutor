@@ -8,7 +8,7 @@ export function parseYouTubeId(input: string): string | null {
     if (host === "youtube.com" || host === "youtube-nocookie.com") {
       if (u.searchParams.get("v")) return valid(u.searchParams.get("v")!);
       const m = u.pathname.match(/^\/(embed|shorts|live|v)\/([\w-]{11})/);
-      if (m) return m[2];
+      if (m) return m[2] ?? null;
     }
   } catch {
     return null;
