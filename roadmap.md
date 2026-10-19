@@ -9,5 +9,5 @@
 - [ ] Transcript ingestion server function (YouTube captions → timed segments)
 - [ ] Server-side text extraction for PDF / PPTX / DOCX → page chunks
 - [ ] Embeddings + retrieval (filter `end <= asked_at` in SQL before ranking)
-- [ ] AI tutor server function (streamed, cites only supplied evidence IDs, refuses when evidence is missing)
+- [x] AI tutor server function (cites only supplied evidence IDs, refuses when evidence is missing; not streamed)
 - [ ] Not now: mock interview feature

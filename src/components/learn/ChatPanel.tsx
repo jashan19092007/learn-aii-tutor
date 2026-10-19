@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { ArrowUp, BookOpen, GitCompare, Lightbulb, ListChecks, PlayCircle, ScrollText, Wand2 } from "lucide-react";
+import { ArrowUp, BookOpen, GitCompare, Lightbulb, ListChecks, Loader2, PlayCircle, ScrollText, Wand2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import type { Evidence } from "@/lib/retrieval";
@@ -26,19 +26,21 @@ export function ChatPanel({
   currentTime,
   onAsk,
   onCite,
+  pending = false,
 }: {
   messages: ChatMessage[];
   currentTime: number;
   onAsk: (text: string) => void;
   onCite: (e: Evidence) => void;
+  pending?: boolean;
 }) {
   const [text, setText] = useState("");
   const ta = useRef<HTMLTextAreaElement>(null);
   const end = useRef<HTMLDivElement>(null);
-  useEffect(() => { end.current?.scrollIntoView({ behavior: "smooth" }); ta.current?.focus(); }, [messages.length]);
+  useEffect(() => { end.current?.scrollIntoView({ behavior: "smooth" }); ta.current?.focus(); }, [messages.length, pending]);
 
   const send = (t: string) => {
-    if (!t.trim()) return;
+    if (!t.trim() || pending) return;
     onAsk(t.trim());
     setText("");
   };
@@ -97,13 +99,18 @@ export function ChatPanel({
             </div>
           ),
         )}
+        {pending && (
+          <div className="flex items-center gap-2 text-sm text-muted-foreground" role="status">
+            <Loader2 className="h-3.5 w-3.5 animate-spin" /> Tutor is thinking…
+          </div>
+        )}
         <div ref={end} />
       </div>
 
       <div className="border-t border-border p-3">
         <div className="mb-2 flex flex-wrap gap-1.5">
           {QUICK_ACTIONS.map((a) => (
-            <Button key={a.id} size="sm" variant="secondary" className="h-7 rounded-full text-xs" onClick={() => send(a.prompt)}>
+            <Button key={a.id} size="sm" variant="secondary" className="h-7 rounded-full text-xs" disabled={pending} onClick={() => send(a.prompt)}>
               <a.icon className="h-3 w-3" /> {a.label}
             </Button>
           ))}
@@ -121,7 +128,7 @@ export function ChatPanel({
             rows={1}
             className="min-h-9 resize-none border-0 shadow-none focus-visible:ring-0"
           />
-          <Button type="submit" size="icon" className="h-9 w-9 shrink-0" disabled={!text.trim()} aria-label="Send">
+          <Button type="submit" size="icon" className="h-9 w-9 shrink-0" disabled={!text.trim() || pending} aria-label="Send">
             <ArrowUp className="h-4 w-4" />
           </Button>
         </form>

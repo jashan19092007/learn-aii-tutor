@@ -8,8 +8,9 @@ import { VideoPlayer, type VideoPlayerHandle } from "@/components/learn/VideoPla
 import { ChatPanel, type ChatMessage } from "@/components/learn/ChatPanel";
 import { MaterialsPanel, kindOf, type Material } from "@/components/learn/MaterialsPanel";
 import { buildEvidence, chunkText, type DocumentChunk, type Evidence, type TranscriptSegment } from "@/lib/retrieval";
-import { formatTime } from "@/lib/youtube";
 import { toast } from "sonner";
+import { useServerFn } from "@tanstack/react-start";
+import { askTutor } from "@/lib/tutor.functions";
 
 export const Route = createFileRoute("/learn")({
   validateSearch: z.object({ v: z.string().regex(/^[\w-]{11}$/) }),
@@ -54,23 +55,32 @@ function Workspace() {
     }
   };
 
-  const onAsk = (text: string) => {
+  const ask = useServerFn(askTutor);
+  const [pending, setPending] = useState(false);
+
+  const onAsk = async (text: string) => {
+    if (pending) return;
     const askedAt = time;
     player.current?.pause();
-    const evidence = buildEvidence(transcript, chunks, askedAt);
-    const videoCount = evidence.filter((e) => e.kind === "video").length;
-    const docCount = evidence.length - videoCount;
-    setMessages((m) => [
-      ...m,
-      { id: uid(), role: "user", text, askedAt },
-      {
-        id: uid(),
-        role: "notice",
-        text:
-          `Evidence available up to ${formatTime(askedAt)}: ${videoCount} transcript segment(s), ${docCount} document page(s). ` +
-          "The AI tutor isn't connected yet, so no answer was generated.",
-      },
-    ]);
+    const history = messages
+      .filter((m) => m.role === "user" || m.role === "assistant")
+      .slice(-10)
+      .map((m) => ({ role: m.role as "user" | "assistant", text: m.text }));
+    setMessages((m) => [...m, { id: uid(), role: "user", text, askedAt }]);
+    setPending(true);
+    try {
+      const res = await ask({ data: { question: text, askedAt, transcript, chunks, history } });
+      setMessages((m) => [
+        ...m,
+        res.ok
+          ? { id: uid(), role: "assistant", text: res.answer, citations: res.citations }
+          : { id: uid(), role: "notice", text: res.error },
+      ]);
+    } catch {
+      setMessages((m) => [...m, { id: uid(), role: "notice", text: "Couldn't reach the tutor. Check your connection and try again." }]);
+    } finally {
+      setPending(false);
+    }
   };
 
   const onCite = (e: Evidence) => {
@@ -100,7 +110,7 @@ function Workspace() {
           />
         </div>
         <div className="lg:sticky lg:top-[72px] lg:h-[calc(100vh-88px)]">
-          <ChatPanel messages={messages} currentTime={time} onAsk={onAsk} onCite={onCite} />
+          <ChatPanel messages={messages} currentTime={time} onAsk={onAsk} onCite={onCite} pending={pending} />
         </div>
       </main>
     </div>
