@@ -35,7 +35,7 @@ function loadApi() {
   return apiPromise;
 }
 
-export type VideoPlayerHandle = { seek(s: number): void; pause(): void };
+export type VideoPlayerHandle = { seek(s: number): void; pause(): void; getTime(): number };
 
 export const VideoPlayer = forwardRef<VideoPlayerHandle, { videoId: string; onTime: (t: number) => void }>(
   function VideoPlayer({ videoId, onTime }, ref) {
@@ -46,8 +46,9 @@ export const VideoPlayer = forwardRef<VideoPlayerHandle, { videoId: string; onTi
     const [playing, setPlaying] = useState(false);
 
     useImperativeHandle(ref, () => ({
-      seek: (s) => player.current?.seekTo(s, true),
+      seek: (s) => { player.current?.seekTo(s, true); setTime(s); onTime(s); },
       pause: () => player.current?.pauseVideo(),
+      getTime: () => player.current?.getCurrentTime() ?? time,
     }));
 
     useEffect(() => {
@@ -63,7 +64,7 @@ export const VideoPlayer = forwardRef<VideoPlayerHandle, { videoId: string; onTi
           playerVars: { rel: 0, modestbranding: 1 },
           events: {
             onReady: (e: { target: YTPlayer }) => setDuration(e.target.getDuration()),
-            onStateChange: (e: { data: number }) => setPlaying(e.data === window.YT!.PlayerState.PLAYING),
+             onStateChange: (e: { data: number }) => setPlaying(e.data === window.YT?.PlayerState.PLAYING),
           },
         });
       });

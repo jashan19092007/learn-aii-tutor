@@ -82,17 +82,21 @@ export function ChatPanel({
               {!!m.citations?.length && (
                 <div className="flex flex-wrap gap-1.5">
                   {m.citations.map((c) => (
-                    <button
+                    <Button
                       key={c.id}
+                      variant="ghost"
+                      size="sm"
+                      aria-label={c.kind === "video" ? `Jump to ${formatTime(c.start)}` : `${c.materialName}, page ${c.page}`}
+                      title={c.kind === "video" ? `Jump to ${formatTime(c.start)}` : `${c.materialName}, page ${c.page}`}
                       onClick={() => onCite(c)}
                       className={
                         c.kind === "video"
-                          ? "inline-flex items-center gap-1 rounded-md bg-cite-video px-2 py-0.5 text-xs font-medium text-cite-video-foreground"
-                          : "inline-flex items-center gap-1 rounded-md bg-cite-doc px-2 py-0.5 text-xs font-medium text-cite-doc-foreground"
+                          ? "h-auto gap-1 rounded-md bg-cite-video px-2 py-0.5 text-xs font-medium text-cite-video-foreground"
+                          : "h-auto gap-1 rounded-md bg-cite-doc px-2 py-0.5 text-xs font-medium text-cite-doc-foreground"
                       }
                     >
                       {c.kind === "video" ? <><PlayCircle className="h-3 w-3" /> {formatTime(c.start)}</> : <>{c.materialName} · p.{c.page}</>}
-                    </button>
+                    </Button>
                   ))}
                 </div>
               )}

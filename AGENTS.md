@@ -15,3 +15,5 @@
 - Study materials are always a separate source kind ("document") from video transcript — keeps citations distinguishable.
 - Model calls and document parsing run server-side only — keeps keys and heavy parsing off the client.
 - AI tutor calls go through `src/lib/tutor.functions.ts`, which re-runs `buildEvidence` server-side — the client's filtering is never trusted.
+- Caption ingestion uses the official YouTube API with editor authorization and an explicit public-video allowlist, or server-parsed SRT/VTT/timestamped text — prevents scraping and accidental exposure of private captions.
+- Conversation history carries its pause point and is filtered server-side when rewinding — prevents later lecture answers from leaking into earlier questions.

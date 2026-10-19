@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { buildEvidence, eligibleTranscript, validateCitations, type TranscriptSegment } from "./retrieval";
+import { buildEvidence, eligibleHistory, eligibleTranscript, validateCitations, type TranscriptSegment } from "./retrieval";
 
 const at = (m: number, s: number) => m * 60 + s;
 const segs: TranscriptSegment[] = [
@@ -9,6 +9,9 @@ const segs: TranscriptSegment[] = [
 ];
 
 describe("timestamp-aware retrieval", () => {
+  it("excludes later conversation and untracked answers after rewinding to 18:42", () => {
+    expect(eligibleHistory([{ text: "before", askedAt: 1100 }, { text: "at cutoff", askedAt: 1122 }, { text: "future", askedAt: 1123 }, { text: "unknown" }], 1122).map((m) => m.text)).toEqual(["before", "at cutoff"]);
+  });
   it("at 18:42 excludes transcript spoken after 18:42", () => {
     const ids = eligibleTranscript(segs, at(18, 42)).map((s) => s.id);
     expect(ids).toEqual(["a"]);
