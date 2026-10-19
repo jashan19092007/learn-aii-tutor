@@ -22,7 +22,9 @@ export function parseTimestampedTranscript(raw: string, videoId: string): { segm
   let current: (typeof cues)[number] | undefined;
   let explicit = false;
   let inMetadata = false;
-  for (const line of text.split("\n")) {
+  const lines = text.split("\n");
+  for (let lineIndex = 0; lineIndex < lines.length; lineIndex++) {
+    const line = lines[lineIndex] ?? "";
     const trimmed = line.trim();
     if (/^(WEBVTT|NOTE|STYLE|REGION)(\s|$)/.test(trimmed)) { inMetadata = true; current = undefined; continue; }
     if (!trimmed) { inMetadata = false; continue; }
@@ -35,8 +37,8 @@ export function parseTimestampedTranscript(raw: string, videoId: string): { segm
       continue;
     }
     if (trimmed.includes("-->")) throw new Error("A caption has an invalid timestamp range.");
-    // Numeric SRT cue identifiers are not caption text.
-    if (/^\d+$/.test(trimmed)) continue;
+    // SRT and VTT cue identifiers immediately precede a range, including non-numeric IDs.
+    if (range.test((lines[lineIndex + 1] ?? "").trim())) continue;
     const timingStart = !explicit ? trimmed.match(startOnly) : null;
     if (timingStart?.[1]) {
       current = { start: seconds(timingStart[1]), lines: timingStart[2] ? [timingStart[2]] : [] };

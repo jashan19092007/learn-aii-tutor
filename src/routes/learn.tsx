@@ -11,6 +11,7 @@ import { buildEvidence, chunkText, type DocumentChunk, type Evidence, type Trans
 import { toast } from "sonner";
 import { useServerFn } from "@tanstack/react-start";
 import { askTutor } from "@/lib/tutor.functions";
+import { TranscriptPanel } from "@/components/learn/TranscriptPanel";
 
 export const Route = createFileRoute("/learn")({
   validateSearch: z.object({ v: z.string().regex(/^[\w-]{11}$/) }),
@@ -37,8 +38,11 @@ function Workspace() {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [materials, setMaterials] = useState<Material[]>([]);
   const [chunks, setChunks] = useState<DocumentChunk[]>([]);
-  // Transcript ingestion requires a server-side integration; until then it stays empty.
-  const [transcript] = useState<TranscriptSegment[]>([]);
+  const [transcript, setTranscript] = useState<TranscriptSegment[]>([]);
+  const onTranscript = useCallback((segments: TranscriptSegment[]) => {
+    setTranscript(segments);
+    setMessages([]);
+  }, []);
 
   const onFiles = async (files: FileList) => {
     for (const f of Array.from(files)) {
@@ -60,12 +64,13 @@ function Workspace() {
 
   const onAsk = async (text: string) => {
     if (pending) return;
-    const askedAt = time;
     player.current?.pause();
+    const askedAt = player.current?.getTime() ?? time;
+    setTime(askedAt);
     const history = messages
       .filter((m) => m.role === "user" || m.role === "assistant")
       .slice(-10)
-      .map((m) => ({ role: m.role as "user" | "assistant", text: m.text }));
+      .map((m) => ({ role: m.role as "user" | "assistant", text: m.text, askedAt: m.askedAt }));
     setMessages((m) => [...m, { id: uid(), role: "user", text, askedAt }]);
     setPending(true);
     try {
@@ -73,7 +78,7 @@ function Workspace() {
       setMessages((m) => [
         ...m,
         res.ok
-          ? { id: uid(), role: "assistant", text: res.answer, citations: res.citations }
+          ? { id: uid(), role: "assistant", text: res.answer, citations: res.citations, askedAt }
           : { id: uid(), role: "notice", text: res.error },
       ]);
     } catch {
@@ -84,7 +89,7 @@ function Workspace() {
   };
 
   const onCite = (e: Evidence) => {
-    if (e.kind === "video") player.current?.seek(e.start);
+    if (e.kind === "video") { player.current?.pause(); player.current?.seek(e.start); }
   };
 
   return (
@@ -100,6 +105,7 @@ function Workspace() {
       <main className="mx-auto grid max-w-[1500px] gap-4 p-4 lg:grid-cols-[minmax(0,1fr)_420px]">
         <div className="space-y-4">
           <VideoPlayer ref={player} videoId={v} onTime={onTime} />
+          <TranscriptPanel videoId={v} transcript={transcript} currentTime={time} onTranscript={onTranscript} />
           <MaterialsPanel
             materials={materials}
             onFiles={onFiles}

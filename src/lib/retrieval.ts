@@ -46,7 +46,12 @@ export function buildEvidence(
 /** Drop any citation the model returns that does not point at real supplied evidence. */
 export function validateCitations(citedIds: string[], evidence: Evidence[]) {
   const known = new Map(evidence.map((e) => [e.id, e]));
-  return citedIds.filter((id) => known.has(id)).map((id) => known.get(id)!);
+  return citedIds.flatMap((id) => { const item = known.get(id); return item ? [item] : []; });
+}
+
+/** Rewinding must not leak later lecture answers through conversation history. */
+export function eligibleHistory<T extends { askedAt?: number }>(history: T[], askedAt: number): T[] {
+  return history.filter((message) => message.askedAt !== undefined && Number.isFinite(message.askedAt) && message.askedAt <= askedAt);
 }
 
 /** Split plain-text materials into numbered "pages" so citations can reference them. */
