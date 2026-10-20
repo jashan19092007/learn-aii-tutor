@@ -1,12 +1,14 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
-import { parseTimestampedTranscript, retrieveAuthorizedCaptions, type CaptionFetchResult } from "./transcript.server";
+import { parseTimestampedTranscript, retrieveAuthorizedCaptions, retrieveProviderCaptions, type CaptionFetchResult } from "./transcript.server";
 
 const VideoId = z.string().regex(/^[\w-]{11}$/);
 
 export const getVideoTranscript = createServerFn({ method: "POST" })
   .inputValidator((input: { videoId: string }) => z.object({ videoId: VideoId }).parse(input))
   .handler(async ({ data }): Promise<CaptionFetchResult> => {
+    const apiKey = process.env['YOUTUBE_TRANSCRIPT_DEV_API_KEY'];
+    if (apiKey) return retrieveProviderCaptions(data.videoId, apiKey);
     const token = process.env['YOUTUBE_CAPTIONS_ACCESS_TOKEN'];
     if (!token) return { ok: false, error: "Automatic captions require authorization from an account allowed to edit this YouTube video. Paste or upload an authorized timestamped transcript below." };
     // This public function may expose only videos the owner explicitly approved for public use.
