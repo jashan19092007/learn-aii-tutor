@@ -25,6 +25,15 @@ describe("YouTubeTranscript.dev captions", () => {
     expect(JSON.stringify(result)).not.toContain("private-provider-details");
     expect(request).toHaveBeenCalledTimes(1);
   });
+  it("respects the documented Retry-After header on rate limits", async () => {
+    const request = vi.fn<typeof fetch>().mockResolvedValue(new Response("rate_limit_exceeded", { status: 429, headers: { "retry-after": "3" } }));
+    const result = await retrieveProviderCaptions("uKECGJBaOmY", "test-only-key", request);
+    expect(result.ok).toBe(false);
+    if (result.ok) return;
+    expect(result.error).toContain("3 seconds");
+    expect(JSON.stringify(result)).not.toContain("rate_limit_exceeded");
+    expect(request).toHaveBeenCalledTimes(1);
+  });
   it("rejects missing or invalid timestamps rather than inventing them", async () => {
     const request = vi.fn<typeof fetch>().mockResolvedValue(Response.json({ status: "completed", data: { video_id: "uKECGJBaOmY", transcript: { segments: [{ text: "bad", start: 1000, end: 500 }] } } }));
     expect((await retrieveProviderCaptions("uKECGJBaOmY", "test-only-key", request)).ok).toBe(false);

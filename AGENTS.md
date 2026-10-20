@@ -16,4 +16,5 @@
 - Model calls and document parsing run server-side only — keeps keys and heavy parsing off the client.
 - AI tutor calls go through `src/lib/tutor.functions.ts`, which re-runs `buildEvidence` server-side — the client's filtering is never trusted.
 - Caption ingestion prefers YouTubeTranscript.dev v2 captions-only via a server-held key; otherwise use official editor-authorized, allowlisted captions or server-parsed imports — avoids audio transcription charges and keeps secrets off the client.
+- YouTubeTranscript.dev free plan allows 1 req/s and returns 429 with Retry-After; `getVideoTranscript` dedupes in-flight calls and caches successes 5 min per videoId, and 429 errors surface the Retry-After wait — never add client retry loops.
 - Conversation history carries its pause point and is filtered server-side when rewinding — prevents later lecture answers from leaking into earlier questions.

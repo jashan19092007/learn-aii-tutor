@@ -70,6 +70,15 @@ export type CaptionFetchResult =
   | { ok: true; segments: TranscriptSegment[]; warning?: string; source: "YouTube captions" | "YouTubeTranscript.dev captions" }
   | { ok: false; error: string };
 
+function retryAfterSeconds(header: string | null): number | undefined {
+  if (!header) return undefined;
+  const seconds = Number(header);
+  if (Number.isFinite(seconds) && seconds > 0) return Math.ceil(seconds);
+  const date = Date.parse(header);
+  if (Number.isFinite(date)) return Math.max(1, Math.ceil((date - Date.now()) / 1000));
+  return undefined;
+}
+
 /** Documented v2 format: timestamps are milliseconds. Never start billable ASR jobs. */
 export async function retrieveProviderCaptions(videoId: string, apiKey: string, request: typeof fetch = fetch): Promise<CaptionFetchResult> {
   try {
@@ -80,12 +89,14 @@ export async function retrieveProviderCaptions(videoId: string, apiKey: string, 
       signal: AbortSignal.timeout(25000),
     });
     if (!response.ok) {
+      // Free plan allows 1 req/s; 429 responses carry a Retry-After header (seconds or HTTP date).
+      const retryAfter = response.status === 429 ? retryAfterSeconds(response.headers.get("retry-after")) : undefined;
       const error = response.status === 401 || response.status === 403
         ? "YouTubeTranscript.dev rejected authorization. Check the saved API key and account access."
         : response.status === 402
           ? "YouTubeTranscript.dev credits are exhausted. Import a transcript instead."
           : response.status === 429
-            ? "YouTubeTranscript.dev is rate-limiting requests. Retry later or import a transcript."
+            ? `YouTubeTranscript.dev is rate-limiting requests. ${retryAfter ? `Wait about ${retryAfter} second${retryAfter === 1 ? "" : "s"}, then retry.` : "Wait a moment, then retry, or import a transcript."}`
             : "Captions could not be retrieved for this video. They may be unavailable; paste or upload a timestamped transcript.";
       return { ok: false, error };
     }
