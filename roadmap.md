@@ -5,7 +5,7 @@
 
 - [x] App structure: landing, lecture workspace (player, tutor chat, materials, quick actions, citation chips)
 - [x] Timestamp-aware evidence filter + citation validation (tested)
-- [ ] Enable Lovable Cloud (auth, database, storage)
+- [x] Enable Lovable Cloud (auth, database, storage) — connected 2026-10-20; generated src/integrations/supabase client files.
 - [ ] Auth: email/password + Google; profiles table
 - [ ] Tables: lectures, transcript_segments, materials, material_chunks, conversations, messages (RLS per user)
 - [ ] Storage bucket for uploaded materials (private)
