@@ -1,4 +1,5 @@
 import type { TranscriptSegment } from "./retrieval";
+import { z } from "zod";
 
 function seconds(value: string): number {
   const parts = value.replace(",", ".").split(":").map(Number);
@@ -66,8 +67,48 @@ export function parseTimestampedTranscript(raw: string, videoId: string): { segm
 }
 
 export type CaptionFetchResult =
-  | { ok: true; segments: TranscriptSegment[]; warning?: string; source: "YouTube captions" }
+  | { ok: true; segments: TranscriptSegment[]; warning?: string; source: "YouTube captions" | "YouTubeTranscript.dev captions" }
   | { ok: false; error: string };
+
+/** Documented v2 format: timestamps are milliseconds. Never start billable ASR jobs. */
+export async function retrieveProviderCaptions(videoId: string, apiKey: string, request: typeof fetch = fetch): Promise<CaptionFetchResult> {
+  try {
+    const response = await request("https://www.youtubetranscript.dev/api/v2/transcribe", {
+      method: "POST",
+      headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
+      body: JSON.stringify({ video: videoId, mode: "captions_only", format: { timestamp: true } }),
+      signal: AbortSignal.timeout(25000),
+    });
+    if (!response.ok) {
+      const error = response.status === 401 || response.status === 403
+        ? "YouTubeTranscript.dev rejected authorization. Check the saved API key and account access."
+        : response.status === 402
+          ? "YouTubeTranscript.dev credits are exhausted. Import a transcript instead."
+          : response.status === 429
+            ? "YouTubeTranscript.dev is rate-limiting requests. Retry later or import a transcript."
+            : "Captions could not be retrieved for this video. They may be unavailable; paste or upload a timestamped transcript.";
+      return { ok: false, error };
+    }
+    const parsed = z.object({
+      status: z.literal("completed"),
+      data: z.object({
+        video_id: z.literal(videoId),
+        transcript: z.object({ segments: z.array(z.object({
+          text: z.string().trim().min(1),
+          start: z.number().finite().nonnegative(),
+          end: z.number().finite().nonnegative(),
+        }).refine((s) => s.end > s.start)).min(1).max(5000) }),
+      }),
+    }).safeParse(await response.json());
+    if (!parsed.success) return { ok: false, error: "No complete timestamped captions were returned. Paste or upload a timestamped transcript instead." };
+    const segments = parsed.data.data.transcript.segments.map((s, i) => ({
+      id: `${videoId}:caption:${i}`, start: s.start / 1000, end: s.end / 1000, text: s.text,
+    })).sort((a, b) => a.start - b.start);
+    return { ok: true, source: "YouTubeTranscript.dev captions", segments };
+  } catch {
+    return { ok: false, error: "YouTubeTranscript.dev could not be reached or returned invalid captions. Retry or import a timestamped transcript." };
+  }
+}
 
 /** Official API only: caller-supplied server OAuth authorization must belong to a video editor. */
 export async function retrieveAuthorizedCaptions(videoId: string, token: string, request: typeof fetch = fetch): Promise<CaptionFetchResult> {

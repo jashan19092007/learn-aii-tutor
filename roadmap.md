@@ -1,5 +1,7 @@
 # LearnFlow roadmap
 
+- [ ] Connect saved YouTubeTranscript.dev key via existing transcript function and test one real retrieval; no Cloud, database or UI changes.
+
 - [x] App structure: landing, lecture workspace (player, tutor chat, materials, quick actions, citation chips)
 - [x] Timestamp-aware evidence filter + citation validation (tested)
 - [ ] Enable Lovable Cloud (auth, database, storage)
