@@ -1,10 +1,11 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
-import { ArrowRight, Clock, FileText, PlayCircle, Quote, ShieldCheck, Sparkles } from "lucide-react";
+import { ArrowRight, ArrowUpRight, Clock, FileText, PlayCircle, Quote } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Logo } from "@/components/Logo";
 import { parseYouTubeId } from "@/lib/youtube";
+import lectureBoard from "@/assets/lecture-board.jpg";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -44,103 +45,69 @@ function Index() {
   };
 
   return (
-    <div className="relative min-h-screen overflow-hidden bg-background">
-      <div aria-hidden className="pointer-events-none absolute inset-0">
-        <div className="absolute -top-40 left-1/2 h-[520px] w-[900px] -translate-x-1/2 rounded-full bg-primary/20 blur-3xl" />
-        <div className="absolute top-40 -right-32 h-80 w-80 rounded-full bg-accent/30 blur-3xl" />
-        <div className="absolute inset-0 bg-[linear-gradient(to_right,var(--border)_1px,transparent_1px),linear-gradient(to_bottom,var(--border)_1px,transparent_1px)] bg-[size:56px_56px] opacity-40 [mask-image:radial-gradient(ellipse_at_top,black_30%,transparent_75%)]" />
-      </div>
-
-      <header className="relative mx-auto flex max-w-6xl items-center justify-between px-6 py-5">
-        <Logo />
-        <Button variant="ghost" size="sm" onClick={() => go(SAMPLE)} className="gap-1.5">
-          <PlayCircle className="h-4 w-4" /> Live demo
-        </Button>
-      </header>
-
-      <main className="relative mx-auto max-w-5xl px-6 pb-24 pt-12 text-center md:pt-20">
-        <span className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-card/80 px-3.5 py-1.5 text-xs font-semibold text-primary shadow-sm backdrop-blur">
-          <span className="relative flex h-2 w-2">
-            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary opacity-60" />
-            <span className="relative inline-flex h-2 w-2 rounded-full bg-primary" />
-          </span>
-          Grounded AI lecture copilot
-        </span>
-
-        <h1 className="mx-auto mt-7 max-w-4xl font-display text-4xl font-bold leading-[1.05] tracking-tight text-foreground sm:text-5xl md:text-7xl">
-          Pause the lecture.
-          <br />
-          <span className="bg-gradient-to-r from-primary via-primary-glow to-accent bg-clip-text text-transparent">
-            Ask what you missed.
-          </span>
-        </h1>
-        <p className="mx-auto mt-6 max-w-2xl text-base text-muted-foreground md:text-lg">
-          Paste any YouTube lecture. LearnFlow answers using only what you've watched so far — with clickable citations to the exact second and page.
-        </p>
-
-        <form
-          onSubmit={submit}
-          className="mx-auto mt-10 flex max-w-2xl flex-col gap-2 rounded-2xl border border-border bg-card/90 p-2 shadow-[0_20px_60px_-20px_color-mix(in_oklab,var(--primary)_40%,transparent)] ring-1 ring-primary/10 backdrop-blur sm:flex-row"
-        >
-          <div className="flex flex-1 items-center gap-2 pl-3">
-            <PlayCircle className="h-5 w-5 shrink-0 text-muted-foreground" />
-            <Input
-              value={url}
-              onChange={(e) => { setUrl(e.target.value); setError(null); }}
-              placeholder="https://www.youtube.com/watch?v=…"
-              className="h-12 border-0 bg-transparent px-1 text-base shadow-none focus-visible:ring-0"
-              aria-label="YouTube lecture URL"
-            />
-          </div>
-          <Button type="submit" variant="hero" className="group h-12 gap-2 px-6 text-base">
-            Start learning <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+    <div className="min-h-screen bg-background">
+      <section className="relative isolate overflow-hidden bg-ink text-ink-foreground">
+        <img src={lectureBoard} alt="" width={1536} height={1024} className="pointer-events-none absolute inset-0 -z-10 h-full w-full object-cover object-right opacity-20 md:opacity-100" />
+        <header className="mx-auto flex max-w-6xl items-center justify-between border-b border-ink-foreground/15 bg-ink/80 px-6 py-5 md:px-10">
+          <Logo />
+          <Button variant="ghost" size="sm" onClick={() => go(SAMPLE)} className="gap-2 text-ink-foreground hover:bg-ink-foreground/10 hover:text-ink-foreground">
+            <PlayCircle /> Try a lecture <ArrowUpRight />
           </Button>
-        </form>
-        {error && <p className="mt-3 text-sm text-destructive">{error}</p>}
-        <button
-          type="button"
-          onClick={() => go(SAMPLE)}
-          className="mt-4 text-sm font-medium text-muted-foreground underline-offset-4 transition-colors hover:text-primary hover:underline"
-        >
-          No link handy? Try a sample calculus lecture →
-        </button>
+        </header>
 
-        <div className="mx-auto mt-16 max-w-3xl rounded-2xl border border-border bg-card/90 p-5 text-left shadow-[0_30px_80px_-30px_color-mix(in_oklab,var(--foreground)_35%,transparent)] backdrop-blur">
-          <div className="flex items-center justify-between text-xs text-muted-foreground">
-            <span className="inline-flex items-center gap-1.5 font-medium">
-              <Clock className="h-3.5 w-3.5 text-primary" /> Paused at 04:55
-            </span>
-            <span className="inline-flex items-center gap-1.5">
-              <ShieldCheck className="h-3.5 w-3.5 text-primary" /> Evidence up to 04:55 only
-            </span>
-          </div>
-          <div className="mt-4 space-y-3">
-            <div className="ml-auto w-fit max-w-[85%] rounded-2xl rounded-br-sm bg-primary px-4 py-2.5 text-sm text-primary-foreground">
-              Why is u = x and not eˣ here?
-            </div>
-            <div className="max-w-[90%] rounded-2xl rounded-bl-sm bg-muted px-4 py-3 text-sm text-foreground">
-              <p className="flex items-center gap-1.5 text-xs font-semibold text-primary"><Sparkles className="h-3.5 w-3.5" /> LearnFlow tutor</p>
-              <p className="mt-1.5">Choosing u = x makes du/dx = 1, so the second integral becomes simply ∫eˣ dx. That's the ILATE rule the lecturer used.</p>
-              <div className="mt-2.5 flex flex-wrap gap-1.5">
-                <span className="rounded-md bg-cite-video px-2 py-0.5 text-xs font-medium text-cite-video-foreground">▶ 04:12</span>
-                <span className="rounded-md bg-cite-doc px-2 py-0.5 text-xs font-medium text-cite-doc-foreground">notes.pdf · p.3</span>
+        <main className="mx-auto max-w-6xl px-6 pb-14 pt-12 md:px-10 md:pb-16 md:pt-14">
+          <div className="max-w-2xl">
+            <p className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.15em] text-ink-foreground/70">
+              <span className="h-1.5 w-1.5 rounded-full bg-accent" /> Your personal AI study companion
+            </p>
+            <h1 className="mt-5 font-display text-6xl font-semibold leading-none tracking-normal sm:text-7xl md:text-8xl">LearnFlow<span className="text-accent">.</span></h1>
+            <h2 className="mt-5 max-w-xl font-display text-3xl font-medium leading-tight tracking-normal sm:text-4xl">
+              Less rewinding.<br /><span className="text-accent">More understanding.</span>
+            </h2>
+            <p className="mt-5 max-w-md text-sm leading-relaxed text-ink-foreground/70 sm:text-base">
+              Turn a YouTube lecture into a conversation. Pause, ask a question, and find your way forward.
+            </p>
+
+            <form onSubmit={submit} className="mt-7 flex max-w-xl flex-col gap-2 rounded-lg bg-card p-2 shadow-panel sm:flex-row">
+              <div className="flex min-w-0 flex-1 items-center gap-2 pl-2 text-foreground">
+                <PlayCircle className="h-5 w-5 shrink-0 text-muted-foreground" />
+                <Input value={url} onChange={(e) => { setUrl(e.target.value); setError(null); }} placeholder="Paste a YouTube lecture link" className="h-11 min-w-0 border-0 bg-transparent px-1 text-sm shadow-none focus-visible:ring-0" aria-label="YouTube lecture URL" />
               </div>
-            </div>
+              <Button type="submit" variant="default" className="group h-11 gap-2 px-5">
+                Start learning <ArrowRight className="transition-transform group-hover:translate-x-0.5 motion-reduce:transition-none" />
+              </Button>
+            </form>
+            {error && <p role="alert" className="mt-3 rounded-md bg-card px-3 py-2 text-sm text-destructive">{error}</p>}
+            <Button type="button" variant="link" onClick={() => go(SAMPLE)} className="mt-2 h-auto px-0 py-2 text-xs text-ink-foreground/70 hover:text-ink-foreground">
+              Or explore a sample lecture <ArrowUpRight />
+            </Button>
           </div>
+          <div className="mt-9 flex flex-wrap gap-x-6 gap-y-3 border-t border-ink-foreground/15 pt-5 text-xs text-ink-foreground/65">
+            <span className="flex items-center gap-2"><Clock className="h-3.5 w-3.5 text-accent" /> In sync with your lecture</span>
+            <span className="flex items-center gap-2"><Quote className="h-3.5 w-3.5 text-accent" /> Sources you can trace</span>
+            <span className="flex items-center gap-2"><FileText className="h-3.5 w-3.5 text-accent" /> Your notes, connected</span>
+          </div>
+        </main>
+      </section>
+
+      <section className="mx-auto max-w-6xl px-6 py-10 md:px-10 md:py-12">
+        <div className="mb-8 flex flex-wrap items-end justify-between gap-3">
+          <h2 className="font-display text-2xl font-semibold tracking-normal">Stay curious. Keep your flow.</h2>
+          <span className="text-xs text-muted-foreground">A little clarity goes a long way.</span>
         </div>
-
-        <div className="mt-16 grid gap-4 text-left md:grid-cols-3">
-          {features.map((f) => (
-            <div key={f.title} className="group rounded-2xl border border-border bg-card/80 p-6 backdrop-blur transition-all hover:-translate-y-1 hover:border-primary/30 hover:shadow-lg">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-secondary text-primary">
-                <f.icon className="h-5 w-5" />
-              </div>
-              <h3 className="mt-4 font-display font-semibold">{f.title}</h3>
-              <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">{f.body}</p>
+        <div className="grid gap-7 md:grid-cols-3 md:gap-10">
+          {features.map((f, i) => (
+            <div key={f.title} className="border-t border-border pt-5">
+              <div className="flex items-center justify-between"><f.icon className="h-5 w-5 text-primary" /><span className="font-mono text-xs text-muted-foreground">0{i + 1}</span></div>
+              <h3 className="mt-4 font-display text-base font-semibold tracking-normal">{f.title}</h3>
+              <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{f.body}</p>
             </div>
           ))}
         </div>
-      </main>
+      </section>
+      <footer className="mx-auto flex max-w-6xl items-center justify-between border-t border-border px-6 py-5 text-xs text-muted-foreground md:px-10">
+        <span>LearnFlow</span><span>Made for the moment it clicks.</span>
+      </footer>
     </div>
   );
 }
