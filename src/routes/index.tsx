@@ -47,8 +47,8 @@ function Index() {
   return (
     <div className="min-h-screen bg-background">
       <section className="relative isolate overflow-hidden bg-ink text-ink-foreground">
-        <img src={lectureBoard} alt="" width={1536} height={1024} className="pointer-events-none absolute inset-0 -z-10 h-full w-full object-cover object-right" />
-        <header className="mx-auto flex max-w-6xl items-center justify-between border-b border-ink-foreground/15 px-6 py-5 md:px-10">
+        <img src={lectureBoard} alt="" width={1536} height={1024} className="pointer-events-none absolute inset-0 -z-10 h-full w-full object-cover object-right opacity-20 md:opacity-100" />
+        <header className="mx-auto flex max-w-6xl items-center justify-between border-b border-ink-foreground/15 bg-ink/80 px-6 py-5 md:px-10">
           <Logo />
           <Button variant="ghost" size="sm" onClick={() => go(SAMPLE)} className="gap-2 text-ink-foreground hover:bg-ink-foreground/10 hover:text-ink-foreground">
             <PlayCircle /> Try a lecture <ArrowUpRight />
