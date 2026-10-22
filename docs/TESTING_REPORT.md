@@ -1,181 +1,105 @@
 # LearnFlow AI | Testing & Evaluation Report
 
 **Project:** LearnFlow AI  
-**Live Application:** https://learn-aii-tutor.lovable.app/  
-**Source Repository:** https://github.com/jashan19092007/learn-aii-tutor  
-**Scope:** Functional testing and evaluation  
-**Report Type:** Functional verification and evaluation  
-**Last Documented Issue:** AI Tutor unable to answer after runtime credits were exhausted
+**Production URL:** https://learnflow-ai-one.vercel.app/  
+**Repository:** https://github.com/jashan19092007/learn-aii-tutor  
+**Scope:** Functional verification and evaluation  
+**Status:** Production end-to-end checks pending independent confirmation
 
----
+## 1. Evaluation objectives
 
-## 01 / Testing Objectives
+Evaluate YouTube playback, timestamped transcript retrieval, playback-aware evidence filtering, Gemini AI Tutor responses, source citation accuracy, error handling, and mobile usability.
 
-The objective of this evaluation is to assess the reliability, functionality, and accuracy of LearnFlow AI's core learning workflow.
+## 2. Functional verification matrix
 
-The evaluation focuses on:
+| ID | Test | Available evidence | Production status |
+|---|---|---|---|
+| T01 | Public deployment | Vercel domain configured | Browser verification pending |
+| T02 | YouTube playback | Previously reported functional in development | Retest on Vercel |
+| T03 | Transcript retrieval | Real retrieval reported for video `uKECGJBaOmY`: 193 captions | Retest on Vercel |
+| T04 | Gemini AI Tutor | Gemini server-side integration implemented | Successful Vercel response not independently confirmed |
+| T05 | Timestamp citation navigation | Citation handling implemented and previously tested in development | Retest on Vercel |
+| T06 | Future-content restriction | Server-side timestamp filtering implemented | Production adversarial test pending |
+| T07 | Manual transcript import | SRT/VTT/TXT import available in application | Retest on Vercel |
+| T08 | Missing captions | Fallback import path documented | Error-path test pending |
+| T09 | Rate limiting | Retry-After handling, deduplication, five-minute cache previously reported | Production test pending |
+| T10 | Responsive design | Responsive UI implemented | Device testing pending |
+| T11 | Knowledge Horizon | Playback-aware context visualization implemented | Live synchronization test pending |
+| T12 | Learning materials | Upload and processing paths vary by file type | Format-specific tests pending |
 
-- YouTube lecture playback
-- Timestamped transcript retrieval
-- AI-assisted question answering
-- Response grounding and citation accuracy
-- Playback-aware context restrictions
-- API error handling
-- Application usability
+**Interpretation:** “Implemented” and “previously reported” are not equivalent to a recorded production test pass. No production success rate or accuracy percentage is claimed.
 
-Testing outcomes are distinguished from functionality that has not yet been verified.
+## 3. Test procedure
 
----
+1. Open https://learnflow-ai-one.vercel.app/ in a fresh browser session.
+2. Load an educational YouTube video with captions; record its URL and video ID.
+3. Confirm playback, pause, seeking, and transcript timestamps.
+4. Pause early and ask a question answered only later in the lecture. Confirm future transcript content is not cited as watched evidence.
+5. Ask three questions answerable from captions already watched. Compare each answer and timestamp citation with the actual transcript.
+6. Ask for an additional explanation and confirm it is distinguished from lecture-sourced evidence.
+7. Click citations and verify that the player seeks to the referenced timestamp.
+8. Test manual transcript import and a video without available captions.
+9. Repeat key checks on mobile and inspect Vercel function logs for failures.
 
-## 02 / Functional Test Matrix
+## 4. Recorded development observations
 
-| ID | Test | Procedure | Recorded Outcome | Next Action |
-|---|---|---|---|---|
-| T01 | Public deployment | Open published application URL | Live website previously reported accessible | Record verification date |
-| T02 | YouTube playback | Load an educational YouTube video | Previously reported working | Confirm with selected test video |
-| T03 | Transcript retrieval | Retrieve captions from a supported video | Previously reported working; one test returned 193 captions | Repeat with evaluation video |
-| T04 | AI Tutor response | Ask a question supported by the transcript | **Blocked:** AI provider integration unresolved | Fix and retest |
-| T05 | Citation accuracy | Compare response timestamps with transcript | Not verified | Test after AI Tutor is operational |
-| T06 | Future-content restriction | Ask about later content while paused early | Not verified | Validate context filtering |
-| T07 | Manual transcript import | Import transcript content manually | Feature previously reported; not retested | Confirm in deployed application |
-| T08 | Missing captions | Load video without available captions | Not verified | Evaluate fallback behavior |
-| T09 | API rate limiting | Test provider rate-limit handling | Retry and caching behavior previously reported | Verify current implementation |
-| T10 | Mobile responsiveness | Test application on mobile viewport | Not verified | Perform responsive testing |
+- YouTubeTranscript.dev retrieval was previously reported successful for `uKECGJBaOmY`, returning **193 captions**.
+- Rate-limit handling with Retry-After, request deduplication, and five-minute successful-result caching were previously reported.
+- The application includes server-side evidence filtering and citation validation.
+- The original AI integration encountered Lovable AI Gateway credit limitations. The implementation was subsequently migrated toward Google Gemini.
+- A Gemini server function is present, but a successful end-to-end answer on the Vercel production deployment has not been independently confirmed for this report.
 
-**Note:** Tests are not classified as passed unless successful execution has been recorded.
+These are development observations, not newly executed tests.
 
----
+## 5. Question-level evaluation
 
-## 03 / Known Issue and Investigation
+| Case | Playback position | Expected behavior | Recorded result |
+|---|---|---|---|
+| Q1: Already-covered definition | To be recorded | Answer using eligible captions | Pending |
+| Q2: Future lecture topic | Before topic begins | Do not attribute later captions to watched lecture | Pending |
+| Q3: Supplementary explanation | To be recorded | Label external Gemini explanation separately | Pending |
 
-### AI Tutor Integration
+## 6. Quantitative metrics
 
-The initial AI Tutor implementation used Lovable AI Gateway.
-
-During development, the available runtime AI credits were exhausted, preventing further AI-generated responses.
-
-A migration to Google Gemini was subsequently initiated. However, successful responses from the new integration have not yet been confirmed.
-
-### Investigation Areas
-
-The following components require verification:
-
-1. AI provider authentication
-2. API key configuration
-3. Model availability and compatibility
-4. Backend function execution
-5. Request and response processing
-6. Provider quota and rate limits
-7. Error handling and logging
-
-**Current Status:** The precise cause of the unresolved Gemini integration issue has not been established.
-
----
-
-## 04 / Evaluation Methodology
-
-### Transcript Retrieval Evaluation
-
-1. Select an educational YouTube lecture.
-2. Record its title, URL, and video identifier.
-3. Retrieve its transcript using LearnFlow AI.
-4. Verify that transcript segments contain timestamps.
-5. Compare selected captions against the original lecture.
-6. Record retrieval errors or delays where measurable.
-
-### AI Response Evaluation
-
-Once the AI Tutor is operational:
-
-1. Select three factual questions answerable from the lecture.
-2. Submit each question through the AI Tutor.
-3. Compare responses against transcript evidence.
-4. Classify responses as:
-   - **Supported:** Consistent with available transcript evidence.
-   - **Partially Supported:** Contains both supported and insufficiently supported information.
-   - **Unsupported:** Cannot be established from the transcript.
-5. Verify timestamp references where available.
-
-### Playback-Aware Context Evaluation
-
-1. Pause the lecture before a selected concept is introduced.
-2. Ask a question about that later concept.
-3. Observe whether the AI uses information beyond the playback position.
-4. Repeat using another future-content question.
-5. Document any unsupported disclosure of later transcript content.
-
----
-
-## 05 / Evaluation Results
-
-### Question-Level Evaluation
-
-| Question | Playback Position | Transcript Evidence | AI Response | Grounding Result | Citation Accuracy |
-|---|---|---|---|---|---|
-| Q1 | Not recorded | Not recorded | Not tested | Pending | Pending |
-| Q2 | Not recorded | Not recorded | Not tested | Pending | Pending |
-| Q3 | Not recorded | Not recorded | Not tested | Pending | Pending |
-
-No question-level accuracy results are claimed because the required evaluation has not been completed.
-
----
-
-## 06 / Performance Metrics
-
-| Metric | Recorded Result |
+| Metric | Result |
 |---|---|
-| Transcript retrieval success rate | Not measured |
-| AI response success rate | Not measured |
+| Production transcript retrieval success rate | Not measured |
+| Production Gemini response success rate | Not measured |
 | Answer grounding accuracy | Not measured |
-| Timestamp citation accuracy | Not measured |
+| Citation accuracy | Not measured |
 | Future-content leakage rate | Not measured |
-| Median AI response time | Not measured |
+| Median response latency | Not measured |
 
-These metrics require repeatable testing and recorded observations before numerical results can be reported.
+Numerical performance claims require repeatable recorded test runs.
 
----
+## 7. Known limitations
 
-## 07 / Reliability and Security Checks
+- Transcript availability depends on external API access, captions, and quota.
+- Gemini calls depend on valid credentials, a supported model, and available quota.
+- Model-generated explanations and citations require factual verification.
+- Some document formats may not be fully processed.
+- The mock interview extension is future scope, not a verified deliverable.
 
-| Check | Status |
-|---|---|
-| Application publicly accessible | Previously reported working |
-| Video playback | Previously reported working |
-| Transcript retrieval | Previously reported working |
-| AI provider availability | Requires verification |
-| Invalid URL handling | Not verified |
-| Transcript API failure handling | Not verified |
-| API credential exposure | Not audited |
-| Mobile usability | Not verified |
+## 8. Submission verification checklist
 
----
+- [ ] Public Vercel page loads
+- [ ] YouTube video plays
+- [ ] Captions load from the server
+- [ ] Knowledge Horizon updates with playback
+- [ ] Gemini produces a successful answer
+- [ ] Timestamp citations seek correctly
+- [ ] Future-content question does not cite later transcript
+- [ ] Supported transcript import works
+- [ ] Mobile layout is usable
+- [ ] All documentation links open
 
-## 08 / Current Evaluation Summary
+## References
 
-LearnFlow AI has a published application and previously demonstrated YouTube playback and timestamped transcript retrieval during development.
+- [Live Application](https://learnflow-ai-one.vercel.app/)
+- [Repository](https://github.com/jashan19092007/learn-aii-tutor)
+- [Project README](../README.md)
+- [API Documentation](../API_DOCUMENTATION.md)
+- [Deployment Guide](../DEPLOYMENT.md)
+- [Architecture Diagram](architecture.png)
 
-The AI Tutor integration encountered runtime credit limitations. A subsequent provider migration was initiated, but successful AI responses remain unverified.
-
-Consequently, the available evidence does not yet establish complete end-to-end functionality, response accuracy, or reliable playback-aware context enforcement.
-
-Further evaluation should be conducted after the AI integration is operational, with results recorded using reproducible test cases.
-
----
-
-## 09 / Project References
-
-**Live Application:** https://learn-aii-tutor.lovable.app/
-
-**Source Repository:** https://github.com/jashan19092007/learn-aii-tutor
-
-**Project Overview:** [README](../README.md)
-
-**API Documentation:** [API_DOCUMENTATION.md](../API_DOCUMENTATION.md)
-
-**Deployment Guide:** [DEPLOYMENT.md](../DEPLOYMENT.md)
-
-**Architecture Diagram:** [architecture.png](architecture.png)
-
----
-
-*LearnFlow AI — Functional Testing, Reliability & Evaluation Documentation.*
+*This report separates recorded development evidence from outstanding production verification.*
