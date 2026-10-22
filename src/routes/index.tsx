@@ -4,7 +4,6 @@ import { useState, type FormEvent } from "react";
 import {
   ArrowRight,
   ArrowUpRight,
-  BookOpen,
   Check,
   ChevronRight,
   Clock3,
@@ -16,12 +15,9 @@ import {
   Quote,
   ShieldCheck,
   Sparkles,
-  Wand2,
   Zap,
 } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Logo } from "@/components/Logo";
 import { parseYouTubeId } from "@/lib/youtube";
 
 export const Route = createFileRoute("/")({
@@ -139,22 +135,31 @@ function Index() {
             </span>
           </div>
 
-          <div className="hidden items-center gap-8 text-sm text-slate-400 md:flex">
-            <a href="#features" className="transition hover:text-white">
+          <nav className="hidden items-center gap-8 text-sm text-slate-400 md:flex">
+            <a
+              href="#features"
+              className="transition-colors hover:text-white"
+            >
               Features
             </a>
-            <a href="#how-it-works" className="transition hover:text-white">
+            <a
+              href="#how-it-works"
+              className="transition-colors hover:text-white"
+            >
               How it works
             </a>
-            <a href="#experience" className="transition hover:text-white">
+            <a
+              href="#experience"
+              className="transition-colors hover:text-white"
+            >
               Experience
             </a>
-          </div>
+          </nav>
 
           <button
             type="button"
             onClick={() => go(SAMPLE)}
-            className="inline-flex items-center gap-2 rounded-xl border border-white/15 bg-white/10 px-3 py-2 text-xs font-semibold text-white transition hover:border-violet-400/50 hover:bg-white/15 sm:px-4 sm:text-sm"
+            className="hover-lift inline-flex items-center gap-2 rounded-xl border border-white/15 bg-white/10 px-3 py-2 text-xs font-semibold text-white transition-colors hover:border-violet-400/50 hover:bg-white/15 sm:px-4 sm:text-sm"
           >
             Try demo
             <ArrowUpRight className="h-4 w-4" />
@@ -164,10 +169,12 @@ function Index() {
 
       {/* Hero */}
       <section className="relative isolate overflow-hidden">
+        {/* Decorative background */}
         <div className="pointer-events-none absolute inset-0 -z-10">
-          <div className="absolute -left-40 top-20 h-[420px] w-[420px] rounded-full bg-blue-600/20 blur-[110px]" />
-          <div className="absolute right-[-140px] top-0 h-[500px] w-[500px] rounded-full bg-violet-600/20 blur-[120px]" />
+          <div className="animate-soft-pulse absolute -left-40 top-20 h-[420px] w-[420px] rounded-full bg-blue-600/20 blur-[110px]" />
+          <div className="animate-soft-pulse absolute right-[-140px] top-0 h-[500px] w-[500px] rounded-full bg-violet-600/20 blur-[120px]" />
           <div className="absolute bottom-[-160px] left-1/3 h-[400px] w-[400px] rounded-full bg-cyan-500/10 blur-[110px]" />
+
           <div
             className="absolute inset-0 opacity-[0.07]"
             style={{
@@ -181,13 +188,16 @@ function Index() {
         </div>
 
         <div className="mx-auto max-w-7xl px-5 pb-16 pt-20 text-center sm:px-8 sm:pt-24 lg:pt-28">
-          <div className="mx-auto mb-7 inline-flex items-center gap-2 rounded-full border border-violet-400/25 bg-violet-400/10 px-4 py-2 text-xs font-semibold text-violet-200 shadow-lg shadow-violet-900/10">
+          <div className="animate-fade-up mx-auto mb-7 inline-flex items-center gap-2 rounded-full border border-violet-400/25 bg-violet-400/10 px-4 py-2 text-xs font-semibold text-violet-200 shadow-lg shadow-violet-900/10">
             <Sparkles className="h-3.5 w-3.5" />
             Meet your AI-powered learning companion
             <ChevronRight className="h-3.5 w-3.5" />
           </div>
 
-          <h1 className="mx-auto max-w-5xl text-4xl font-extrabold leading-[1.12] tracking-tight sm:text-6xl lg:text-7xl">
+          <h1
+            className="animate-fade-up mx-auto max-w-5xl text-4xl font-extrabold leading-[1.12] tracking-tight sm:text-6xl lg:text-7xl"
+            style={{ animationDelay: "100ms" }}
+          >
             Stop just watching.
             <br />
             <span className="bg-gradient-to-r from-sky-400 via-blue-400 to-violet-400 bg-clip-text text-transparent">
@@ -195,7 +205,10 @@ function Index() {
             </span>
           </h1>
 
-          <p className="mx-auto mt-7 max-w-2xl text-base leading-8 text-slate-400 sm:text-lg">
+          <p
+            className="animate-fade-up mx-auto mt-7 max-w-2xl text-base leading-8 text-slate-400 sm:text-lg"
+            style={{ animationDelay: "200ms" }}
+          >
             Turn passive video lectures into interactive learning.
             Pause at any moment, ask questions, and get AI-powered
             explanations connected to your lecture.
@@ -203,7 +216,8 @@ function Index() {
 
           <form
             onSubmit={submit}
-            className="mx-auto mt-9 flex max-w-2xl flex-col gap-2 rounded-2xl border border-white/15 bg-white/[0.08] p-2 shadow-2xl shadow-blue-950/50 backdrop-blur-xl sm:flex-row"
+            className="animate-fade-up glow-on-hover mx-auto mt-9 flex max-w-2xl flex-col gap-2 rounded-2xl border border-white/15 bg-white/[0.08] p-2 shadow-2xl shadow-blue-950/50 backdrop-blur-xl sm:flex-row"
+            style={{ animationDelay: "300ms" }}
           >
             <div className="flex min-w-0 flex-1 items-center gap-3 px-3">
               <PlayCircle className="h-5 w-5 shrink-0 text-violet-300" />
@@ -221,7 +235,7 @@ function Index() {
 
             <button
               type="submit"
-              className="group inline-flex h-12 shrink-0 items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-blue-500 to-violet-600 px-6 text-sm font-semibold text-white shadow-lg shadow-violet-600/20 transition hover:from-blue-400 hover:to-violet-500"
+              className="gradient-button hover-lift group inline-flex h-12 shrink-0 items-center justify-center gap-2 rounded-xl px-6 text-sm font-semibold"
             >
               Start learning
               <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
@@ -237,15 +251,18 @@ function Index() {
             </p>
           )}
 
-          <div className="mt-5 flex flex-wrap items-center justify-center gap-x-5 gap-y-3">
+          <div
+            className="animate-fade-up mt-5 flex flex-wrap items-center justify-center gap-x-5 gap-y-3"
+            style={{ animationDelay: "400ms" }}
+          >
             <button
               type="button"
               onClick={() => go(SAMPLE)}
-              className="inline-flex items-center gap-2 text-sm font-medium text-slate-300 transition hover:text-white"
+              className="group inline-flex items-center gap-2 text-sm font-medium text-slate-300 transition-colors hover:text-white"
             >
               <Play className="h-4 w-4 text-violet-300" />
               Explore a sample lecture
-              <ArrowUpRight className="h-3.5 w-3.5" />
+              <ArrowUpRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
             </button>
 
             <span className="hidden h-4 w-px bg-white/20 sm:block" />
@@ -256,14 +273,15 @@ function Index() {
             </span>
           </div>
 
-          {/* Product preview */}
+          {/* Animated product preview */}
           <div
             id="experience"
-            className="relative mx-auto mt-20 max-w-6xl scroll-mt-24"
+            className="animate-fade-up relative mx-auto mt-20 max-w-6xl scroll-mt-24"
+            style={{ animationDelay: "450ms" }}
           >
-            <div className="pointer-events-none absolute -inset-5 rounded-[32px] bg-gradient-to-r from-blue-500/15 via-violet-500/20 to-cyan-500/15 blur-3xl" />
+            <div className="animate-soft-pulse pointer-events-none absolute -inset-5 rounded-[32px] bg-gradient-to-r from-blue-500/15 via-violet-500/20 to-cyan-500/15 blur-3xl" />
 
-            <div className="relative overflow-hidden rounded-2xl border border-white/15 bg-[#0e1528] text-left shadow-2xl shadow-black/40 sm:rounded-3xl">
+            <div className="glow-on-hover relative overflow-hidden rounded-2xl border border-white/15 bg-[#0e1528] text-left shadow-2xl shadow-black/40 transition-colors sm:rounded-3xl">
               <div className="flex items-center justify-between border-b border-white/10 bg-white/[0.03] px-4 py-3 sm:px-5">
                 <div className="flex items-center gap-2">
                   <span className="h-2.5 w-2.5 rounded-full bg-red-400/80" />
@@ -280,9 +298,9 @@ function Index() {
               </div>
 
               <div className="grid gap-0 lg:grid-cols-[1.45fr_1fr]">
-                {/* Preview video */}
+                {/* Video preview */}
                 <div className="border-b border-white/10 p-4 sm:p-6 lg:border-b-0 lg:border-r">
-                  <div className="mb-4 flex items-center justify-between">
+                  <div className="mb-4 flex items-center justify-between gap-2">
                     <div className="flex items-center gap-2">
                       <div className="rounded-lg bg-blue-500/15 p-2">
                         <PlayCircle className="h-4 w-4 text-blue-300" />
@@ -303,10 +321,10 @@ function Index() {
                   </div>
 
                   <div className="relative flex aspect-video items-center justify-center overflow-hidden rounded-xl border border-white/10 bg-gradient-to-br from-[#15234a] via-[#131a38] to-[#261746]">
-                    <div className="absolute left-1/2 top-1/2 h-48 w-48 -translate-x-1/2 -translate-y-1/2 rounded-full bg-violet-500/15 blur-3xl" />
+                    <div className="animate-soft-pulse absolute left-1/2 top-1/2 h-48 w-48 -translate-x-1/2 -translate-y-1/2 rounded-full bg-violet-500/15 blur-3xl" />
 
                     <div className="relative flex flex-col items-center gap-4 text-center">
-                      <div className="flex h-16 w-16 items-center justify-center rounded-2xl border border-white/15 bg-white/10 shadow-xl backdrop-blur">
+                      <div className="animate-glow flex h-16 w-16 items-center justify-center rounded-2xl border border-white/15 bg-white/10 shadow-xl backdrop-blur">
                         <Play className="ml-1 h-7 w-7 text-white" />
                       </div>
 
@@ -326,24 +344,28 @@ function Index() {
                   </div>
 
                   <div className="mt-4 flex flex-wrap gap-2">
-                    <span className="rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-xs text-slate-300">
-                      Timestamp-aware
-                    </span>
-                    <span className="rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-xs text-slate-300">
-                      Lecture context
-                    </span>
-                    <span className="rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-xs text-slate-300">
-                      Source citations
-                    </span>
+                    {[
+                      "Timestamp-aware",
+                      "Lecture context",
+                      "Source citations",
+                    ].map((label) => (
+                      <span
+                        key={label}
+                        className="rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-xs text-slate-300"
+                      >
+                        {label}
+                      </span>
+                    ))}
                   </div>
                 </div>
 
-                {/* Preview tutor */}
+                {/* AI Tutor preview */}
                 <div className="flex flex-col p-4 sm:p-6">
                   <div className="flex items-center gap-3 border-b border-white/10 pb-4">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-violet-500/15">
+                    <div className="rounded-xl bg-violet-500/15 p-2.5">
                       <Sparkles className="h-5 w-5 text-violet-300" />
                     </div>
+
                     <div>
                       <p className="text-sm font-semibold text-white">
                         AI Tutor
@@ -364,6 +386,7 @@ function Index() {
                         <Sparkles className="h-3.5 w-3.5" />
                         LearnFlow AI
                       </div>
+
                       <p className="text-sm leading-6 text-slate-300">
                         Absolutely. Let's break it down into
                         simpler steps and connect it to what
@@ -423,7 +446,7 @@ function Index() {
             {features.map((feature) => (
               <article
                 key={feature.title}
-                className="group relative overflow-hidden rounded-2xl border border-white/10 bg-white/[0.035] p-6 transition duration-300 hover:-translate-y-1 hover:border-violet-400/30 hover:bg-white/[0.06] sm:p-7"
+                className="hover-lift glow-on-hover group relative overflow-hidden rounded-2xl border border-white/10 bg-white/[0.035] p-6 transition-colors hover:bg-white/[0.06] sm:p-7"
               >
                 <div
                   className={`pointer-events-none absolute -right-12 -top-12 h-48 w-48 rounded-full bg-gradient-to-br ${feature.color} blur-3xl`}
@@ -431,9 +454,10 @@ function Index() {
 
                 <div className="relative">
                   <div className="mb-8 flex items-center justify-between">
-                    <div className="flex h-12 w-12 items-center justify-center rounded-xl border border-white/10 bg-white/10">
+                    <div className="flex h-12 w-12 items-center justify-center rounded-xl border border-white/10 bg-white/10 transition-transform duration-300 group-hover:scale-110">
                       <feature.icon className="h-6 w-6 text-violet-300" />
                     </div>
+
                     <span className="font-mono text-xs text-slate-500">
                       {feature.number}
                     </span>
@@ -478,10 +502,10 @@ function Index() {
             {steps.map((step) => (
               <div
                 key={step.number}
-                className="relative rounded-2xl border border-white/10 bg-[#10182b] p-7"
+                className="hover-lift glow-on-hover group relative rounded-2xl border border-white/10 bg-[#10182b] p-7"
               >
                 <div className="mb-7 flex items-center justify-between">
-                  <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-violet-500/10 text-violet-300">
+                  <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-violet-500/10 text-violet-300 transition-transform duration-300 group-hover:scale-110">
                     <step.icon className="h-6 w-6" />
                   </div>
 
@@ -505,11 +529,11 @@ function Index() {
 
       {/* Final CTA */}
       <section className="px-5 pb-20 pt-5 sm:px-8">
-        <div className="relative mx-auto max-w-7xl overflow-hidden rounded-3xl border border-violet-400/20 bg-gradient-to-br from-[#182451] via-[#151b3c] to-[#28194d] px-6 py-14 text-center sm:px-10 sm:py-20">
-          <div className="pointer-events-none absolute left-1/2 top-0 h-56 w-96 -translate-x-1/2 rounded-full bg-violet-500/20 blur-3xl" />
+        <div className="glow-on-hover relative mx-auto max-w-7xl overflow-hidden rounded-3xl border border-violet-400/20 bg-gradient-to-br from-[#182451] via-[#151b3c] to-[#28194d] px-6 py-14 text-center sm:px-10 sm:py-20">
+          <div className="animate-soft-pulse pointer-events-none absolute left-1/2 top-0 h-56 w-96 -translate-x-1/2 rounded-full bg-violet-500/20 blur-3xl" />
 
           <div className="relative">
-            <div className="mx-auto mb-6 flex h-14 w-14 items-center justify-center rounded-2xl border border-white/15 bg-white/10">
+            <div className="animate-glow mx-auto mb-6 flex h-14 w-14 items-center justify-center rounded-2xl border border-white/15 bg-white/10">
               <Zap className="h-7 w-7 text-violet-200" />
             </div>
 
@@ -525,10 +549,10 @@ function Index() {
             <button
               type="button"
               onClick={() => go(SAMPLE)}
-              className="mt-8 inline-flex items-center gap-2 rounded-xl bg-white px-6 py-3.5 text-sm font-bold text-[#151b3c] transition hover:bg-violet-100"
+              className="hover-lift group mt-8 inline-flex items-center gap-2 rounded-xl bg-white px-6 py-3.5 text-sm font-bold text-[#151b3c] transition-colors hover:bg-violet-100"
             >
               Experience LearnFlow
-              <ArrowRight className="h-4 w-4" />
+              <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
             </button>
           </div>
         </div>
@@ -541,6 +565,7 @@ function Index() {
             <p className="text-lg font-bold tracking-tight text-white">
               LearnFlow<span className="text-violet-400">.</span>
             </p>
+
             <p className="mt-1 text-xs text-slate-500">
               Learn smarter. Stay curious.
             </p>
