@@ -43,31 +43,36 @@ export const askTutor = createServerFn({ method: "POST" })
       evidenceText;
 
     try {
-      const res = await fetch("https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent", {
-        method: "POST",
-        headers: { "content-type": "application/json", "x-goog-api-key": apiKey },
-        body: JSON.stringify({
-          systemInstruction: { parts: [{ text: instructions }] },
-          contents: [
-            ...eligibleHistory(data.history, data.askedAt).map((h) => ({
-              role: h.role === "assistant" ? ("model" as const) : ("user" as const),
-              parts: [{ text: h.text }],
-            })),
-            { role: "user" as const, parts: [{ text: data.question }] },
-          ],
-          generationConfig: {
-            responseMimeType: "application/json",
-            responseSchema: {
-              type: "OBJECT",
-              required: ["answer", "citations"],
-              properties: {
-                answer: { type: "STRING" },
-                citations: { type: "ARRAY", items: { type: "STRING" } },
-              },
+      const body = JSON.stringify({
+        systemInstruction: { parts: [{ text: instructions }] },
+        contents: [
+          ...eligibleHistory(data.history, data.askedAt).map((h) => ({
+            role: h.role === "assistant" ? ("model" as const) : ("user" as const),
+            parts: [{ text: h.text }],
+          })),
+          { role: "user" as const, parts: [{ text: data.question }] },
+        ],
+        generationConfig: {
+          responseMimeType: "application/json",
+          responseSchema: {
+            type: "OBJECT",
+            required: ["answer", "citations"],
+            properties: {
+              answer: { type: "STRING" },
+              citations: { type: "ARRAY", items: { type: "STRING" } },
             },
           },
-        }),
+        },
       });
+      // Fast free-tier model first; one fallback only when it is overloaded (503) — no retry loops.
+      const call = (model: string) =>
+        fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`, {
+          method: "POST",
+          headers: { "content-type": "application/json", "x-goog-api-key": apiKey },
+          body,
+        });
+      let res = await call("gemini-3.5-flash");
+      if (res.status === 503) res = await call("gemini-3.5-flash-lite");
       if (!res.ok) {
         console.error("Gemini request failed:", res.status);
         if (res.status === 429) return { ok: false, error: "The tutor is busy right now. Please wait a moment and try again." };
