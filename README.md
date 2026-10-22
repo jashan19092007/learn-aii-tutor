@@ -1,28 +1,70 @@
-# Sample Dataset | LearnFlow AI
+# LearnFlow AI — Interactive AI Learning Assistant
 
-This folder describes the timestamped-transcript input used by the lecture tutor.
+LearnFlow AI is a hackathon prototype that helps students understand educational YouTube lectures through timestamp-aware transcripts and an AI-assisted learning interface.
 
-## Included files
+## Live Application
 
-- `sample_transcript.json`: **illustrative schema example**, not an extracted YouTube transcript. Do not present it as real test data.
+**Website:** https://learn-aii-tutor.lovable.app/
 
-## How to create a genuine sample dataset
+**GitHub Repository:** https://github.com/jashan19092007/learn-aii-tutor
 
-1. Open the same educational YouTube lecture used in the demo.
-2. Retrieve its captions through LearnFlow AI / YouTubeTranscript.dev.
-3. Export a short excerpt with exact text, start/end timestamps, video ID, and source URL.
-4. Replace the illustrative JSON with the **actual extracted segments** and update `data_origin` to `youtube_captions`.
-5. Check caption reuse rights and include attribution to the original video.
+## Key Features
 
-## Data dictionary
+- Embedded YouTube lecture player
+- Timestamped transcript retrieval
+- AI Tutor interface for lecture-related questions
+- Transcript-aware learning experience
+- Quick actions for explanations, summaries, and quizzes
+- Lecture resources and notes interface
 
-| Field | Meaning |
-|---|---|
-| `video_id` | YouTube video identifier |
-| `source_url` | Original lecture URL |
-| `data_origin` | Where transcript came from |
-| `segments[].start_seconds` | Start time in seconds |
-| `segments[].end_seconds` | End time in seconds |
-| `segments[].text` | Caption text |
+## Technology Stack
 
-No private student information is required for this dataset.
+- Frontend: React, TypeScript, Tailwind CSS
+- Development and hosting: Lovable
+- Transcript API: YouTubeTranscript.dev
+- Backend: Server-side functions
+- AI: Gemini integration under verification
+
+## How It Works
+
+1. Open LearnFlow AI.
+2. Enter an educational YouTube video URL.
+3. Watch the lecture and retrieve its transcript.
+4. Pause at a specific timestamp.
+5. Ask questions through the AI Tutor interface.
+6. Review explanations using the available lecture context.
+
+AI Tutor responses require a working AI provider configuration. The Gemini integration is currently being verified.
+
+## Local Setup
+
+```bash
+git clone https://github.com/jashan19092007/learn-aii-tutor.git
+cd learn-aii-tutor
+npm install
+npm run dev
+```
+
+Backend functionality requires separately configured API credentials.
+
+## Documentation
+
+- [API Documentation](API_DOCUMENTATION.md)
+- [Deployment Guide](DEPLOYMENT.md)
+- [Architecture Diagram](docs/architecture.png)
+- [Sample Dataset](dataset/sample_transcript.json)
+- [Testing Report](docs/TESTING_REPORT.md)
+
+The sample transcript is illustrative and is not presented as a genuine extracted transcript.
+
+## Project Status
+
+LearnFlow AI is a working web prototype with video and transcript features. AI Tutor integration requires further verification following an AI provider migration.
+
+## Hackathon Submission
+
+**Project:** LearnFlow AI
+
+**Live Demo:** https://learn-aii-tutor.lovable.app/
+
+**Source Code:** https://github.com/jashan19092007/learn-aii-tutor
