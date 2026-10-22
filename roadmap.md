@@ -1,17 +1,43 @@
-# LearnFlow roadmap
+# LearnFlow AI | Roadmap
 
-- [x] Connect saved YouTubeTranscript.dev key via existing transcript function; captions-only, no Cloud/database/UI changes; 22 tests passed.
-- [x] Successful real retrieval for uKECGJBaOmY — 193 captions (0.28s–553.76s) via YouTubeTranscript.dev; 429 fixed with Retry-After handling + server-side request dedupe/5-min cache (free plan is 1 req/s).
+**Production URL:** https://learnflow-ai-one.vercel.app/  
+**Repository:** https://github.com/jashan19092007/learn-aii-tutor
 
-- [x] App structure: landing, lecture workspace (player, tutor chat, materials, quick actions, citation chips)
-- [x] Timestamp-aware evidence filter + citation validation (tested)
-- [x] Enable Lovable Cloud (auth, database, storage) — connected 2026-10-20; generated src/integrations/supabase client files.
-- [ ] Auth: email/password + Google; profiles table
-- [ ] Tables: lectures, transcript_segments, materials, material_chunks, conversations, messages (RLS per user)
-- [ ] Storage bucket for uploaded materials (private)
-- [x] Implement official authorized YouTube caption retrieval, timestamped paste/upload fallback and clear status (20 tests pass; browser upload, errors, real AI fixture answer and citation seek verified)
-- [ ] Test lecture-based answers for uKECGJBaOmY end-to-end in the browser — transcript retrieval now verified; tutor flow with real captions not yet re-tested.
-- [ ] Server-side text extraction for PDF / PPTX / DOCX → page chunks
-- [ ] Embeddings + retrieval (filter `end <= asked_at` in SQL before ranking)
-- [x] AI tutor server function (cites only supplied evidence IDs, refuses when evidence is missing; not streamed)
-- [ ] Not now: mock interview feature
+## Implemented or previously reported in development
+
+- [x] Lecture workspace with YouTube player, transcript, materials, and AI Tutor chat
+- [x] Timestamp-aware transcript filtering and citation validation
+- [x] YouTubeTranscript.dev captions-only integration
+- [x] Development retrieval for video `uKECGJBaOmY` (193 captions)
+- [x] Transcript rate-limit handling, request deduplication, and five-minute success cache
+- [x] Manual transcript import using supported timestamped formats
+- [x] Gemini server-side AI Tutor integration
+- [x] Knowledge Horizon context visualization
+- [x] Vercel production domain configured
+- [x] README, API, and deployment documentation updated for Vercel
+
+## Verification still required on Vercel
+
+- [ ] Confirm public website and lecture navigation
+- [ ] Confirm transcript retrieval with a real video
+- [ ] Confirm successful Gemini AI Tutor answer
+- [ ] Confirm lecture citations seek to correct timestamps
+- [ ] Confirm future transcript content is excluded from lecture evidence
+- [ ] Confirm Knowledge Horizon tracks playback correctly
+- [ ] Confirm manual transcript import
+- [ ] Confirm supported learning-material handling
+- [ ] Confirm mobile usability
+- [ ] Record reproducible results in `docs/TESTING_REPORT.md`
+
+## Future scope
+
+- [ ] AI-powered mock interview extension
+- [ ] Speech-to-text fallback for videos without captions
+- [ ] Robust server-side PDF/PPTX/DOCX extraction
+- [ ] User authentication and profiles
+- [ ] Persistent lectures, conversations, and material storage
+- [ ] Personalized learning analytics and adaptive quizzes
+
+## Development notes
+
+The repository retains a Lovable connection and may sync commits to its editor. **Vercel is the documented production deployment.** Historical Lovable integration notes in `AGENTS.md` should remain accurate. Avoid rewriting published Git history.
