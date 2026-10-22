@@ -1,6 +1,6 @@
 # LearnFlow AI — Interactive AI Learning Assistant
 
-LearnFlow AI is a hackathon prototype that helps students understand educational YouTube lectures through timestamp-aware transcripts and an AI-assisted learning interface.
+LearnFlow AI is a interactive learning platform that helps students understand educational YouTube lectures through timestamp-aware transcripts and an AI-assisted learning interface.
 
 ## Live Application
 
@@ -61,7 +61,7 @@ The sample transcript is illustrative and is not presented as a genuine extracte
 
 LearnFlow AI is a working web prototype with video and transcript features. AI Tutor integration requires further verification following an AI provider migration.
 
-## Hackathon Submission
+## Project links
 
 **Project:** LearnFlow AI
 
