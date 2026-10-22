@@ -1,7 +1,7 @@
 # LearnFlow AI | Deployment Guide
 
-> Hackathon submission · Deployment and verification notes
-
+> Technical deployment, environment configuration, and verification guide
+> 
 ## Live Application
 
 **Production URL:** [https://learn-aii-tutor.lovable.app/](https://learn-aii-tutor.lovable.app/)
