@@ -1,0 +1,19 @@
+{
+  "dataset_name": "LearnFlow AI transcript schema example",
+  "data_origin": "illustrative_synthetic_example_NOT_real_youtube_transcript",
+  "video_id": "REPLACE_WITH_ACTUAL_VIDEO_ID",
+  "source_url": "REPLACE_WITH_ACTUAL_VIDEO_URL",
+  "language": "en",
+  "segments": [
+    {
+      "start_seconds": 0.0,
+      "end_seconds": 4.5,
+      "text": "This is an illustrative transcript segment, not a quotation from a video."
+    },
+    {
+      "start_seconds": 4.5,
+      "end_seconds": 9.0,
+      "text": "Replace these examples with actual timestamped captions from your selected lecture."
+    }
+  ]
+}
