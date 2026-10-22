@@ -69,7 +69,7 @@ export const askTutor = createServerFn({ method: "POST" })
         }),
       });
       if (!res.ok) {
-        console.error("Gemini request failed:", res.status);
+        console.error("Gemini request failed:", res.status, (await res.text()).slice(0, 500));
         if (res.status === 429) return { ok: false, error: "The tutor is busy right now. Please wait a moment and try again." };
         return { ok: false, error: "The tutor couldn't answer right now. Please try again." };
       }
