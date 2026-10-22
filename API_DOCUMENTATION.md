@@ -2,11 +2,11 @@
 
 ### Technical Architecture, Integrations & AI Learning Workflow
 
-**Live Application:** https://learn-aii-tutor.lovable.app/
+**Live Application:** https://learnflow-ai-one.vercel.app/
 
 **Source Repository:** https://github.com/jashan19092007/learn-aii-tutor
 
-**Technical Resources:**
+## Technical Resources
 
 - [Architecture Diagram](docs/architecture.png)
 - [Project Overview](README.md)
@@ -17,208 +17,432 @@
 
 ## 01 / System Overview
 
-LearnFlow AI is an interactive learning platform designed to enhance educational video content through timestamp-aware transcript retrieval and AI-assisted explanations.
+LearnFlow AI is an interactive learning platform that combines YouTube lecture playback, timestamp-aware transcript retrieval, and Google Gemini-powered educational assistance.
 
-The platform integrates YouTube video playback, transcript processing, and an AI-powered learning interface within a unified workspace.
-
-External API credentials are managed through server-side functions to prevent exposure in the client application.
+The platform is built using React, TypeScript, TanStack Start, and Tailwind CSS, with deployment through Vercel.
 
 ### Core Capabilities
 
-- **Video Integration:** Embedded YouTube lectures with playback controls.
-- **Transcript Retrieval:** Timestamped caption extraction through YouTubeTranscript.dev.
-- **Context-Aware Learning:** Using lecture transcripts to provide relevant learning context.
-- **AI Assistance:** An interface for explanations, summaries, and lecture-related questions.
-- **Secure API Communication:** Server-side credential management and external API integration.
+- Embedded YouTube lecture player
+- Automatic transcript retrieval where available
+- Manual timestamped transcript import
+- Timestamp-aware lecture-context filtering
+- Knowledge Horizon visualization
+- AI-generated explanations and summaries
+- Source citations linked to lecture timestamps
+- Supported learning material processing
+- Secure server-side API communication
 
 ### Integration Overview
 
-| Integration | Purpose | Execution Environment | Status |
-|---|---|---|---|
-| YouTube Embedded Player | Video playback and lecture navigation | Browser | Implemented in prototype |
-| YouTubeTranscript.dev | Timestamped transcript retrieval | Server-side function | Implemented in prototype |
-| AI Generation Service | Lecture-specific explanations | Server-side integration | Requires final verification |
-| Manual Transcript Input | Alternative transcript source | Application interface | Reported available |
-
----
+| Integration | Purpose | Environment |
+|---|---|---|
+| YouTube IFrame Player API | Lecture playback and timestamp tracking | Browser |
+| YouTubeTranscript.dev | Timestamped transcript retrieval | Server |
+| Google Gemini API | AI Tutor explanations and question answering | Server |
+| TanStack Start | Application routing and server functions | Application |
+| Vercel | Hosting and server execution | Cloud |
 
 ## 02 / Transcript Retrieval API
-
-### API Provider
 
 **Provider:** YouTubeTranscript.dev
 
 **Documentation:** https://www.youtubetranscript.dev/api-docs
 
-**HTTP Method:** `POST`
+**API Endpoint:** `POST /api/v2/transcribe`
 
-**Endpoint:** `/api/v2/transcribe`
+**Authentication:** Bearer token
 
-**Purpose:** Retrieve timestamped captions from educational YouTube videos.
+**Environment Variable:** `YOUTUBE_TRANSCRIPT_DEV_API_KEY`
 
-### Authentication
+The application requests available captions using `captions_only` mode.
 
-API requests use bearer-token authentication.
-
-The transcript provider credential should be configured as a server-side secret:
-
-```text
-YOUTUBE_TRANSCRIPT_DEV_API_KEY
-```
-
-Authentication credentials must never be exposed through frontend source code, browser responses, or public repositories.
-
-### Request Structure
-
-The application has been configured to request available YouTube captions using `captions_only` mode.
-
-The following example illustrates the intended request structure:
+### Illustrative Request
 
 ```http
 POST /api/v2/transcribe HTTP/1.1
-Authorization: Bearer <SERVER_SIDE_API_KEY>
+Authorization: Bearer <API_KEY>
 Content-Type: application/json
 ```
 
 ```json
 {
   "mode": "captions_only",
-  "<video-input-field>": "<YouTube video URL or ID>"
+  "video": "https://www.youtube.com/watch?v=VIDEO_ID"
 }
 ```
 
-The video input field is intentionally represented as a placeholder. Its exact name must be confirmed against the server-side implementation and provider documentation.
+The request is illustrative; the exact input field and payload should be checked against the implementation.
 
-### Normalized Transcript Structure
+### Transcript Processing
 
-Transcript information is processed into timestamped segments that can be displayed alongside the video.
+1. The user submits a YouTube lecture URL.
+2. The application extracts the video ID.
+3. A server function requests the transcript.
+4. Caption data is converted into timestamped segments.
+5. The transcript is made available to the learning workspace.
+6. Playback position determines which segments are eligible for AI context.
 
-Illustrative normalized data:
+### Transcript Data Example
 
 ```json
 {
-  "videoId": "example-video",
   "segments": [
     {
-      "startSeconds": 12.4,
-      "endSeconds": 17.8,
-      "text": "Introduction to the selected concept."
+      "start": 12.4,
+      "end": 17.8,
+      "text": "Introduction to the concept."
     },
     {
-      "startSeconds": 17.8,
-      "endSeconds": 24.1,
-      "text": "Explanation of the concept continues."
+      "start": 17.8,
+      "end": 24.1,
+      "text": "The explanation continues."
     }
   ]
 }
 ```
 
-This example represents an application-level data structure, not a verified raw response from the provider.
+This is illustrative normalized data, not a raw provider response.
 
-### Transcript Processing Workflow
+### Manual Transcript Import
 
-1. The learner submits a YouTube video URL.
-2. The application identifies the selected video.
-3. A backend function requests the corresponding transcript.
-4. YouTubeTranscript.dev processes the request and returns available caption information.
-5. Transcript segments are normalized for the learning interface.
-6. Timestamped captions are displayed alongside the video player.
+If automatic retrieval is unavailable, users can import timestamped transcripts using supported formats:
 
----
+- SRT
+- VTT
+- Timestamped TXT
+
+Imported transcripts are processed into the same general segment structure.
 
 ## 03 / YouTube Player Integration
 
-LearnFlow AI uses an embedded YouTube player to deliver educational video content.
+LearnFlow uses the YouTube IFrame Player API.
 
-The player provides lecture playback functionality, while transcript information is retrieved through a separate API integration.
+### Supported Player Operations
 
-### Relevant Data
-
-| Parameter | Description |
+| Operation | Description |
 |---|---|
-| Video ID | Unique identifier of the selected YouTube lecture |
-| Playback Position | Current video position in seconds |
-| Transcript Start Time | Beginning of a caption segment |
-| Transcript End Time | Ending of a caption segment |
-| Transcript Text | Spoken educational content associated with the timestamp |
+| Play | Resume lecture playback |
+| Pause | Stop playback at the current timestamp |
+| Seek | Navigate to a specified lecture position |
+| Get Current Time | Retrieve the current playback timestamp |
+| Get Duration | Retrieve total video duration |
 
-### Timestamp-Aware Learning
+The player synchronizes playback information with the transcript interface and AI Tutor.
 
-The intended workflow uses the learner's current playback position to determine which transcript segments are eligible to support an AI-generated answer.
+### Timestamp-Aware Context
 
-For example, when a learner pauses at 120 seconds, the AI should use only transcript information covered up to that point.
+For a question asked at time `T`, the application selects eligible lecture segments based on that timestamp.
 
-This restriction must be enforced before transcript content is sent to the AI provider. Its implementation requires verification against the deployed backend.
-
----
-
-## 04 / AI-Assisted Learning Workflow
-
-LearnFlow AI includes an AI Tutor interface designed to help students understand lecture content.
-
-### Intended Processing Flow
+Conceptually:
 
 ```text
-Student submits a question
-          |
-          v
-Retrieve current playback timestamp
-          |
-          v
-Select eligible transcript segments
-          |
-          v
-Identify relevant lecture context
-          |
-          v
-Send context and question to AI provider
-          |
-          v
-Generate educational explanation
-          |
-          v
-Display response in learning interface
+Current playback position: T
+
+Full transcript
+       |
+       v
+Timestamp filtering
+       |
+       v
+Eligible lecture context
+       |
+       v
+AI Tutor request
 ```
 
-### AI Tutor Capabilities
+This design is intended to prevent future lecture content from being presented as material already watched.
 
-The interface is designed to support:
+## 04 / Knowledge Horizon
 
-- Concept explanations
-- Simplified explanations
-- Lecture summaries
-- Examples and analogies
-- Topic-specific questions
-- Interactive knowledge checks
+Knowledge Horizon represents the boundary between accessible lecture content and future content.
 
-### Grounding and Context Control
+### Inputs
 
-The intended architecture prioritizes responses supported by the selected lecture's transcript.
+- Current playback timestamp
+- Available transcript segments
+- Transcript timestamps
 
-Where sufficient evidence is unavailable, the AI should indicate that the requested information has not yet been covered or cannot be established from the available context.
+### Outputs
 
-The exact AI provider, model, server function, timestamp-filtering implementation, and citation behavior require final verification.
+- Eligible caption count
+- Total caption count
+- Percentage of transcript context available
+- Visual indication of lecture-context coverage
 
----
+### Example
 
-## 05 / AI Provider Integration
+```text
+Lecture duration: 30 minutes
+Current playback: 10 minutes
 
-The initial implementation used Lovable AI Gateway for AI-generated responses.
+Knowledge Horizon:
+Lecture context available up to 10:00
+Future transcript content excluded from lecture evidence
+```
 
-Following runtime credit limitations, a migration to Google Gemini was initiated.
+The feature visualizes transcript eligibility. It is not a guarantee that the AI model will never generate information from its general training knowledge.
 
-### Intended Configuration
+## 05 / Google Gemini API Integration
 
 **AI Provider:** Google Gemini
 
-**Credential:** `GEMINI_API_KEY`
+**Environment Variable:** `GEMINI_API_KEY`
 
-**Execution Environment:** Server-side function
+**Execution:** Server-side application function
 
-### Security Requirements
+The Gemini API generates educational responses using the question, conversation context, and relevant evidence supplied by LearnFlow.
 
-- Store the API key using secure server-side secrets.
-- Never expose the API key to the browser.
-- Avoid committing credentials to version control.
-- Validate requests before invoking the AI provider.
-- Handle authentication
+### AI Tutor Workflow
+
+```text
+Student asks a question
+         |
+         v
+Capture playback timestamp
+         |
+         v
+Select eligible transcript segments
+         |
+         v
+Retrieve relevant evidence
+         |
+         v
+Include supported learning materials
+         |
+         v
+Construct AI request
+         |
+         v
+Send request to Gemini
+         |
+         v
+Process AI response
+         |
+         v
+Display answer and citations
+```
+
+### Supported Learning Actions
+
+- Explain a concept
+- Simplify an explanation
+- Generate examples
+- Summarize available lecture content
+- Compare concepts
+- Generate practice questions
+
+### Conversation Context
+
+Recent conversation history can be included in AI requests to support follow-up questions.
+
+The application should continue enforcing the current lecture-context boundary when processing follow-up questions.
+
+## 06 / Lecture Evidence vs. External Knowledge
+
+LearnFlow is designed to distinguish between information derived from the lecture and supplementary AI-generated knowledge.
+
+### From the Lecture
+
+Information supported by eligible transcript segments.
+
+Examples include:
+
+- Definitions stated by the lecturer
+- Concepts explained before the current timestamp
+- Examples discussed in the available lecture context
+
+### From Your Materials
+
+Information supported by processed, uploaded learning resources.
+
+Only material that has been successfully extracted and made available to the backend can be used as evidence.
+
+### Additional Explanation — Gemini AI
+
+Supplementary information that may not appear in the lecture.
+
+Examples include:
+
+- General background knowledge
+- Additional analogies
+- Alternative explanations
+- Illustrative examples
+
+This distinction is intended to make AI-generated answers more transparent.
+
+**Limitation:** Separating sources through prompts and evidence selection does not guarantee perfect attribution. Generated responses should be verified against their cited sources.
+
+## 07 / Evidence and Citations
+
+LearnFlow associates AI responses with relevant source evidence.
+
+### Video Evidence
+
+A video citation identifies a timestamp within the lecture.
+
+Example:
+
+```json
+{
+  "kind": "video",
+  "id": "example-citation",
+  "start": 128
+}
+```
+
+When the learner clicks a video citation, the player seeks to the referenced timestamp.
+
+### Document Evidence
+
+Document citations may identify processed learning materials and associated page information where available.
+
+The application must distinguish between successfully processed material and uploaded files whose contents are not yet available to the AI.
+
+### Citation Handling
+
+The interface presents clickable citation controls separately from the generated answer text.
+
+Citation quality depends on evidence retrieval, validation, and the correctness of the underlying source data.
+
+## 08 / Application Server Functions
+
+The application uses TanStack Start server functions rather than exposing external API credentials in the browser.
+
+### Transcript Functions
+
+**Implementation:** `src/lib/transcript.functions.ts`
+
+Responsibilities include:
+
+- Requesting transcript information
+- Processing retrieval results
+- Supporting transcript import
+- Returning transcript data or errors
+
+### AI Tutor Function
+
+**Implementation:** `src/lib/tutor.functions.ts`
+
+Responsibilities include:
+
+- Receiving student questions
+- Processing transcript and document context
+- Calling the Gemini API
+- Returning AI-generated responses
+- Returning available citation information
+- Handling provider errors
+
+### Evidence Retrieval
+
+**Implementation:** `src/lib/retrieval.ts`
+
+Responsibilities include:
+
+- Timestamp-based transcript eligibility
+- Text chunking
+- Evidence selection
+- Supporting source-grounded explanations
+
+These functions are application-internal integrations, not a separately published public REST API.
+
+## 09 / Security
+
+LearnFlow follows a server-side API integration model.
+
+### Security Measures
+
+- Gemini API credentials stored as server-side environment variables
+- Transcript API credentials stored as server-side environment variables
+- External API requests handled by backend functions
+- No intentional exposure of secret credentials in frontend code
+- Public repository excludes actual API keys
+
+### Required Environment Variables
+
+```env
+GEMINI_API_KEY=your_gemini_api_key
+YOUTUBE_TRANSCRIPT_DEV_API_KEY=your_transcript_api_key
+```
+
+API keys should never be committed to GitHub or included in public documentation.
+
+## 10 / Error Handling
+
+| Scenario | Expected Handling |
+|---|---|
+| Invalid YouTube URL | Display a validation message |
+| Captions unavailable | Offer retry or manual transcript import |
+| Transcript API rate limit | Display an appropriate retrieval error |
+| Missing Gemini credentials | Return a server-side configuration error |
+| Gemini API failure | Display a tutor error message |
+| Unsupported document | Notify the user that processing is unavailable |
+| Insufficient lecture evidence | Indicate the limitation of available lecture context |
+
+Actual error messages depend on the current implementation.
+
+## 11 / Deployment
+
+**Hosting Platform:** Vercel
+
+**Production URL:** https://learnflow-ai-one.vercel.app/
+
+**Repository:** https://github.com/jashan19092007/learn-aii-tutor
+
+Deployment requires configuring the Gemini and transcript API credentials through Vercel's environment-variable settings.
+
+For detailed setup instructions, see [Deployment Documentation](DEPLOYMENT.md).
+
+## 12 / Testing and Evaluation
+
+The following scenarios should be tested against the deployed production application:
+
+- YouTube video playback
+- Automatic transcript retrieval
+- Manual transcript import
+- Playback timestamp synchronization
+- Knowledge Horizon updates
+- AI Tutor question answering
+- Lecture-derived explanations
+- Supplementary Gemini explanations
+- Clickable timestamp citations
+- API error handling
+- Responsive layout
+
+Implementation of a feature does not by itself confirm successful production testing.
+
+See [Testing and Evaluation Report](docs/TESTING_REPORT.md) for recorded verification results.
+
+## 13 / Current Limitations
+
+- Transcript retrieval depends on external API availability and quota.
+- Some videos may not have accessible captions.
+- AI-generated explanations can contain inaccuracies.
+- Source attribution is not guaranteed to be perfect.
+- Certain document formats require additional extraction or processing.
+- Gemini functionality depends on valid credentials, model availability, and usage limits.
+- The AI mock interview extension remains future work unless separately implemented.
+
+## 14 / Future Enhancements
+
+- AI-powered mock interviews
+- Speech-to-text fallback
+- Improved PDF and presentation extraction
+- Adaptive quizzes
+- Personalized learning recommendations
+- Topic-level weakness analysis
+- Learning progress tracking
+
+---
+
+**Project:** LearnFlow AI
+
+**Hackathon:** AHGV BuildVerse 2026
+
+**Problem Statement:** PS-1 — AI-Powered Interactive Learning Assistant with AI Mock Interview Extension
+
+**Live Application:** https://learnflow-ai-one.vercel.app/
+
+**Source Code:** https://github.com/jashan19092007/learn-aii-tutor
+
+*LearnFlow AI — Watch. Pause. Ask. Understand. Continue.*
