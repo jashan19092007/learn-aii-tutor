@@ -61,9 +61,10 @@ export const QUICK_ACTIONS = [
 // Clickable timestamp citations remain separate and unchanged.
 function cleanTutorAnswer(answer: string): string {
   return answer
-    .replace(/\[[^\]\n]*:caption:\d+\]/g, "")
+    .replace(/\[[^\]\n]*:caption:\d+[^\]\n]*\]/g, "")
     .replace(/\*\*(.*?)\*\*/g, "$1")
     .replace(/__(.*?)__/g, "$1")
+    .replace(/[ \t]+([.,;:!?])/g, "$1")
     .replace(/\n{3,}/g, "\n\n")
     .trim();
 }
