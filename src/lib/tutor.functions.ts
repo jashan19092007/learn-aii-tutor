@@ -17,7 +17,10 @@ export type TutorResult = { ok: true; answer: string; citations: Evidence[] } | 
 export const askTutor = createServerFn({ method: "POST" })
   .inputValidator((d: z.infer<typeof Input>) => Input.parse(d))
   .handler(async ({ data }): Promise<TutorResult> => {
-    const { generateResponse, GatewayError } = await import("@lovable.dev/ai-gateway");
+    // Tutor answers come from Google Gemini via the server-side GEMINI_API_KEY
+    // secret, never the Lovable AI Gateway — no workspace runtime credits used.
+    const apiKey = process.env['GEMINI_API_KEY'];
+    if (!apiKey) return { ok: false, error: "The tutor is not configured yet. Please try again later." };
     // Re-apply the timestamp cutoff on the server; never trust the client's filtering.
     const evidence = buildEvidence(data.transcript, data.chunks, data.askedAt).slice(-80);
     const evidenceText = evidence.length
@@ -40,37 +43,39 @@ export const askTutor = createServerFn({ method: "POST" })
       evidenceText;
 
     try {
-      const res = await generateResponse({
-        model: "openai/gpt-6-astra",
-        instructions,
-        input: [
-          ...eligibleHistory(data.history, data.askedAt).map((h) => ({ role: h.role, content: h.text })),
-          { role: "user" as const, content: data.question },
-        ],
-        text: {
-          format: {
-            type: "json_schema",
-            name: "tutor_answer",
-            strict: true,
-            schema: {
-              type: "object",
-              additionalProperties: false,
+      const res = await fetch("https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent", {
+        method: "POST",
+        headers: { "content-type": "application/json", "x-goog-api-key": apiKey },
+        body: JSON.stringify({
+          systemInstruction: { parts: [{ text: instructions }] },
+          contents: [
+            ...eligibleHistory(data.history, data.askedAt).map((h) => ({
+              role: h.role === "assistant" ? ("model" as const) : ("user" as const),
+              parts: [{ text: h.text }],
+            })),
+            { role: "user" as const, parts: [{ text: data.question }] },
+          ],
+          generationConfig: {
+            responseMimeType: "application/json",
+            responseSchema: {
+              type: "OBJECT",
               required: ["answer", "citations"],
-              properties: { answer: { type: "string" }, citations: { type: "array", items: { type: "string" } } },
+              properties: {
+                answer: { type: "STRING" },
+                citations: { type: "ARRAY", items: { type: "STRING" } },
+              },
             },
           },
-        },
+        }),
       });
-      let raw = "";
-      let refusal = "";
-      for (const item of res.output ?? []) {
-        if (item.type !== "message") continue;
-        for (const c of item.content) {
-          if (c.type === "output_text") raw += c.text;
-          else if (c.type === "refusal") refusal += c.refusal;
-        }
+      if (!res.ok) {
+        console.error("Gemini request failed:", res.status);
+        if (res.status === 429) return { ok: false, error: "The tutor is busy right now. Please wait a moment and try again." };
+        return { ok: false, error: "The tutor couldn't answer right now. Please try again." };
       }
-      if (!raw) return { ok: false, error: refusal || "The tutor returned an empty answer. Please try again." };
+      const json = (await res.json()) as { candidates?: { content?: { parts?: { text?: string }[] } }[] };
+      const raw = json.candidates?.[0]?.content?.parts?.map((p) => p.text ?? "").join("") ?? "";
+      if (!raw) return { ok: false, error: "The tutor returned an empty answer. Please try again." };
       let parsed: { answer?: unknown; citations?: unknown };
       try { parsed = JSON.parse(raw); } catch { return { ok: false, error: "The tutor's reply couldn't be read. Please try again." }; }
       const answer = typeof parsed.answer === "string" ? parsed.answer : "";
@@ -79,10 +84,6 @@ export const askTutor = createServerFn({ method: "POST" })
       return { ok: true, answer, citations: validateCitations([...new Set(ids)], evidence) };
     } catch (err) {
       console.error(err);
-      if (err instanceof GatewayError) {
-        if (err.httpStatus === 429) return { ok: false, error: "The tutor is busy right now. Please wait a moment and try again." };
-        if (err.httpStatus === 402) return { ok: false, error: "AI credits have run out for this workspace. Add credits to continue." };
-      }
       return { ok: false, error: "The tutor couldn't answer right now. Please try again." };
     }
   });
