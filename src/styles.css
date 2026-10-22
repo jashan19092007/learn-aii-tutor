@@ -18,11 +18,14 @@
   --color-foreground: var(--foreground);
   --color-card: var(--card);
   --color-card-foreground: var(--card-foreground);
+
   --color-popover: var(--popover);
   --color-popover-foreground: var(--popover-foreground);
 
   --color-primary: var(--primary);
   --color-primary-foreground: var(--primary-foreground);
+  --color-primary-glow: var(--primary-glow);
+
   --color-secondary: var(--secondary);
   --color-secondary-foreground: var(--secondary-foreground);
 
@@ -45,8 +48,6 @@
   --color-chart-3: var(--chart-3);
   --color-chart-4: var(--chart-4);
   --color-chart-5: var(--chart-5);
-
-  --color-primary-glow: var(--primary-glow);
 
   --color-ink: var(--ink);
   --color-ink-foreground: var(--ink-foreground);
@@ -72,7 +73,9 @@
   --color-sidebar-ring: var(--sidebar-ring);
 }
 
-/* Premium LearnFlow dark design system */
+/* =========================================
+   LEARNFLOW PREMIUM DARK DESIGN SYSTEM
+========================================= */
 
 :root,
 .dark {
@@ -144,18 +147,17 @@
 
   --sidebar: oklch(0.17 0.03 260);
   --sidebar-foreground: oklch(0.96 0.008 260);
-
   --sidebar-primary: oklch(0.65 0.20 268);
   --sidebar-primary-foreground: oklch(0.99 0 0);
-
   --sidebar-accent: oklch(0.25 0.045 260);
   --sidebar-accent-foreground: oklch(0.95 0.01 260);
-
   --sidebar-border: oklch(0.37 0.035 260 / 0.48);
   --sidebar-ring: oklch(0.69 0.18 268);
 }
 
-/* Base styles */
+/* =========================================
+   BASE STYLES
+========================================= */
 
 @layer base {
   * {
@@ -194,20 +196,25 @@
     outline-color: var(--ring);
   }
 
-  @media (prefers-reduced-motion: reduce) {
-    html {
-      scroll-behavior: auto;
-    }
+  input,
+  textarea,
+  button {
+    font-family: inherit;
+  }
+
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: oklch(0.43 0.05 260) transparent;
   }
 }
 
-/* Hero background */
+/* =========================================
+   PREMIUM BACKGROUNDS & PANELS
+========================================= */
 
 @utility bg-hero {
   background-image: var(--gradient-hero);
 }
-
-/* Shared workspace panels */
 
 @utility panel {
   background: linear-gradient(
@@ -221,7 +228,47 @@
   box-shadow: var(--panel-shadow);
 }
 
-/* Reusable premium effects */
+/* =========================================
+   ANIMATIONS
+========================================= */
+
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes soft-pulse {
+  0%,
+  100% {
+    opacity: 0.5;
+  }
+
+  50% {
+    opacity: 0.85;
+  }
+}
+
+@keyframes glow-breathe {
+  0%,
+  100% {
+    box-shadow: 0 0 20px oklch(0.58 0.2 270 / 0.08);
+  }
+
+  50% {
+    box-shadow: 0 0 38px oklch(0.58 0.2 270 / 0.18);
+  }
+}
+
+/* =========================================
+   PREMIUM INTERACTIVE EFFECTS
+========================================= */
 
 @layer utilities {
   .glass-panel {
@@ -239,6 +286,7 @@
       oklch(0.75 0.17 265),
       oklch(0.76 0.17 305)
     );
+
     background-clip: text;
     -webkit-background-clip: text;
     color: transparent;
@@ -250,8 +298,10 @@
       oklch(0.61 0.19 255),
       oklch(0.59 0.22 285)
     );
+
     color: white;
     box-shadow: 0 8px 25px oklch(0.5 0.2 275 / 0.22);
+
     transition:
       filter 180ms ease,
       transform 180ms ease,
@@ -272,21 +322,65 @@
       0 0 40px oklch(0.58 0.2 270 / 0.09),
       var(--panel-shadow);
   }
-}
 
-/* Polished scrollbars */
-
-@layer base {
-  * {
-    scrollbar-width: thin;
-    scrollbar-color:
-      oklch(0.43 0.05 260)
-      transparent;
+  .animate-fade-up {
+    animation: fade-up 650ms ease-out both;
   }
 
-  input,
-  textarea,
-  button {
-    font-family: inherit;
+  .animate-soft-pulse {
+    animation: soft-pulse 4s ease-in-out infinite;
+  }
+
+  .animate-glow {
+    animation: glow-breathe 4s ease-in-out infinite;
+  }
+
+  .hover-lift {
+    transition:
+      transform 250ms ease,
+      box-shadow 250ms ease,
+      border-color 250ms ease;
+  }
+
+  .hover-lift:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 16px 40px oklch(0.5 0.2 275 / 0.15);
+  }
+
+  .glow-on-hover {
+    transition:
+      box-shadow 250ms ease,
+      border-color 250ms ease;
+  }
+
+  .glow-on-hover:hover {
+    border-color: oklch(0.7 0.18 275 / 0.5);
+    box-shadow: 0 0 30px oklch(0.6 0.2 275 / 0.15);
+  }
+}
+
+/* =========================================
+   ACCESSIBILITY
+========================================= */
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  .animate-fade-up,
+  .animate-soft-pulse,
+  .animate-glow {
+    animation: none !important;
+  }
+
+  .hover-lift,
+  .glow-on-hover,
+  .gradient-button {
+    transition: none !important;
+  }
+
+  .hover-lift:hover {
+    transform: none;
   }
 }
