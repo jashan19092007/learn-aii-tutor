@@ -1,32 +1,72 @@
-# YouTube captions setup
+# LearnFlow AI | YouTube Transcript Setup
 
-The embedded player cannot supply caption text. YouTube's supported caption download API requires OAuth authorization from an account with permission to edit the video; an API key or a public video link is insufficient.
+**Production application:** https://learnflow-ai-one.vercel.app/
 
-## No-setup fallback
+LearnFlow AI retrieves timestamped captions using **YouTubeTranscript.dev** from server-side application functions. The YouTube embedded player supplies playback information, not transcript text.
 
-Import an authorized SRT/VTT caption file or paste timestamped text under **Lecture transcript**. Video owners can export captions from YouTube Studio → Subtitles → Edit → Options → Download subtitles. Public **Show transcript** text can be pasted only where the user has permission to reuse it.
+## 1. Automatic transcript retrieval
 
-Start-only text uses the next timestamp as the preceding caption's conservative end. The final line is excluded when its end time is unknown. SRT/VTT files preserve actual end times. Imported text is user-supplied, not certified as matching the video by LearnFlow.
+**Provider:** [YouTubeTranscript.dev](https://www.youtubetranscript.dev/api-docs)
 
-## Optional official automatic retrieval
+The integration uses the provider's v2 transcription endpoint with `captions_only` mode to request existing captions. Availability depends on the video, provider, and API quota. Automatic speech-to-text fallback is not part of the documented current workflow.
 
-1. Create a Google Cloud project and enable **YouTube Data API v3**.
-2. Configure a Google OAuth consent screen and OAuth client. Authorize the owner/editor account with scope `https://www.googleapis.com/auth/youtube.force-ssl` using Google's supported OAuth flow. For a one-off preview test, Google's OAuth Playground can issue the access token after consent.
-3. Save the OAuth **access token**, not an API key or client secret, as the server-only secret `YOUTUBE_CAPTIONS_ACCESS_TOKEN` in Lovable. Never paste it into chat or frontend code.
-4. Set server-only `YOUTUBE_CAPTIONS_VIDEO_IDS` to a comma-separated list of IDs the owner has explicitly authorized for public caption use. For the requested test video this is `uKECGJBaOmY`, but only approve it with the owner's permission. The public retrieval function refuses all other video IDs to avoid exposing private captions.
-5. Click **Retry caption retrieval**. The app uses `captions.list` then `captions.download?tfmt=vtt`. English is preferred when available; otherwise the first available served track is used, without translating it.
+### Server-side configuration
 
-Access tokens expire. The current integration shows an authorization error when that happens; it does not implement token renewal or per-user OAuth. Durable automatic access needs an approved OAuth flow with refresh-token storage and renewal. This has not been added because the request excludes unrelated account/service setup. Published applications must be republished after changing secrets.
+In Vercel, open the LearnFlow AI project and add the environment variable:
 
-The official list+download request uses 250 quota units (50+200). This is not a public-transcript API for arbitrary lectures. No scraping, unofficial caption endpoints, proxy services, or downloaded-audio transcription are used.
+```env
+YOUTUBE_TRANSCRIPT_DEV_API_KEY=your_transcript_api_key
+```
 
-## Safety
+Configure it for the intended environments and redeploy after adding or changing it. Do not expose API keys in frontend code or commit them to GitHub.
 
-Only completed segments with `end <= askedAt` are passed to the tutor. History from later pause points is excluded after rewinding. Returned citation IDs are checked against the same evidence. Citation clicks pause and seek the existing player to the actual supplied cue start.
+The AI Tutor separately uses:
 
-## Official references
+```env
+GEMINI_API_KEY=your_gemini_api_key
+```
 
-- https://developers.google.com/youtube/v3/docs/captions/list
-- https://developers.google.com/youtube/v3/docs/captions/download
-- https://support.google.com/youtube/answer/2734705
-- https://developers.google.com/youtube/terms/developer-policies
+## 2. Using automatic captions
+
+1. Open the [production application](https://learnflow-ai-one.vercel.app/).
+2. Enter a YouTube lecture URL.
+3. Load the lecture and request its transcript.
+4. Verify that timestamped segments appear.
+5. Pause the lecture and ask a question using the available transcript context.
+
+A development retrieval was previously reported for video ID `uKECGJBaOmY`, returning 193 captions. This is not a claim that the same request was retested on the current Vercel deployment.
+
+## 3. Manual fallback
+
+When automatic retrieval is unavailable, import an authorized **SRT**, **VTT**, or supported timestamped **TXT** transcript.
+
+- SRT and VTT can preserve start and end timestamps.
+- Start-only timestamped text may have conservative inferred boundaries.
+- User-supplied transcripts are not independently certified as matching the video.
+
+Only import or reuse captions where you have the necessary permission.
+
+## 4. Timestamp-aware evidence
+
+The tutor's server-side retrieval logic filters transcript evidence to captions completed by the question's playback timestamp. It also validates returned citation references against supplied evidence.
+
+This restricts which lecture transcript segments are passed to the model; it does not guarantee that a generative model never uses general knowledge. Additional AI explanations should be distinguished from lecture-derived evidence.
+
+## 5. Rate limits and troubleshooting
+
+| Issue | Action |
+|---|---|
+| Missing transcript | Check caption availability; use manual import if needed |
+| Unauthorized request | Verify `YOUTUBE_TRANSCRIPT_DEV_API_KEY` in Vercel |
+| HTTP 429 | Observe provider Retry-After; avoid rapid repeated requests |
+| Deployment not using new key | Redeploy after environment-variable changes |
+| Gemini answer unavailable | Check `GEMINI_API_KEY`, selected model, quota, and server logs |
+
+Development notes report in-flight request deduplication and five-minute caching of successful transcript results. Confirm behavior on the current deployment.
+
+## 6. Related documentation
+
+- [API Documentation](API_DOCUMENTATION.md)
+- [Deployment Guide](DEPLOYMENT.md)
+- [Testing Report](docs/TESTING_REPORT.md)
+- [Provider API Reference](https://www.youtubetranscript.dev/api-docs)
