@@ -2,41 +2,46 @@
 
 > Hackathon submission · Deployment and verification notes
 
-## Live application
+## Live Application
 
-**Production URL:** `ADD_YOUR_PUBLISHED_LOVABLE_URL`
+**Production URL:** [https://learn-aii-tutor.lovable.app/](https://learn-aii-tutor.lovable.app/)
 
-The prototype is hosted through Lovable. The repository contains the application source; publishing and GitHub synchronization are separate operations.
+**GitHub Repository:** [https://github.com/jashan19092007/learn-aii-tutor](https://github.com/jashan19092007/learn-aii-tutor)
+
+The prototype is hosted through Lovable. The repository contains the application source code. Publishing and GitHub synchronization are separate operations.
 
 ## Prerequisites
 
 - Access to the LearnFlow AI Lovable project
 - Access to its connected GitHub repository
 - A working YouTubeTranscript.dev API key
-- An AI-provider API key with available quota (the Gemini migration is **pending verification**)
+- An AI-provider API key with available quota (Gemini migration pending verification)
 
-## Environment configuration
+## Environment Configuration
 
-Set these **server-side secrets** using the project's supported secret-management interface:
+Configure the following server-side secrets through Lovable's secure secret-management interface:
 
-| Secret | Purpose | Notes |
-|---|---|---|
-| `YOUTUBE_TRANSCRIPT_DEV_API_KEY` | Fetch timestamped YouTube captions | Never commit |
-| `GEMINI_API_KEY` | Intended Gemini tutor integration | Only required if migration is implemented and verified |
+| Secret                           | Purpose                                     |
+| -------------------------------- | ------------------------------------------- |
+| `YOUTUBE_TRANSCRIPT_DEV_API_KEY` | Retrieve timestamped YouTube captions       |
+| `GEMINI_API_KEY`                 | Gemini AI Tutor integration, if implemented |
 
-Never store actual API keys in the repository or in client-side environment variables. Verify the exact secret names against the deployed server functions.
+Never expose API keys in frontend code or commit them to GitHub.
 
-## Publish workflow
+## Deployment Process
 
 1. Open the LearnFlow AI project in Lovable.
-2. Verify the current build and server-side secrets.
-3. Publish / update the deployment using Lovable's publish control.
-4. Open the **published URL in a private browser window**.
-5. Paste a YouTube lecture URL and check video playback and transcript retrieval.
-6. Ask a transcript-grounded question; confirm the tutor returns an answer, not an AI quota/authentication error.
-7. Confirm the connected GitHub repository has the latest source commit. GitHub sync does **not** itself prove the live deployment was updated.
+2. Verify the application build and environment secrets.
+3. Click **Publish / Update** to deploy the latest version.
+4. Visit [https://learn-aii-tutor.lovable.app/](https://learn-aii-tutor.lovable.app/).
+5. Enter an educational YouTube video URL.
+6. Verify that video playback and transcript retrieval work.
+7. Ask the AI Tutor a question and verify its response.
+8. Confirm that the latest source code is synchronized with GitHub.
 
-## Local development (verify against package.json)
+## Local Development
+
+Clone the GitHub repository:
 
 ```bash
 git clone https://github.com/jashan19092007/learn-aii-tutor.git
@@ -45,26 +50,36 @@ npm install
 npm run dev
 ```
 
-The local frontend may run without server-side tutor functionality unless backend services and secrets are separately configured. Follow the actual scripts in `package.json` if different.
+The frontend can be run locally using the project's development scripts. Backend features may require additional configuration and API credentials.
 
 ## Troubleshooting
 
-| Symptom | Check |
-|---|---|
-| Video does not load | Valid URL, embed restrictions, browser console |
-| Transcript unavailable | Captions availability, API rate limit, backend logs |
-| Tutor does not answer | Gemini key, model access, free-tier quota, backend logs |
-| `402 Payment Required` from Lovable AI Gateway | Legacy AI Gateway still used or its credits are exhausted |
-| GitHub updated but website unchanged | Publish the latest project version and retest |
+| Issue                                | Suggested Solution                                          |
+| ------------------------------------ | ----------------------------------------------------------- |
+| Video not loading                    | Verify YouTube URL and embedding permissions                |
+| Transcript unavailable               | Check API availability, captions, and rate limits           |
+| AI Tutor not responding              | Verify Gemini API key, model availability, and backend logs |
+| HTTP 402 error                       | Check whether the application still uses Lovable AI Gateway |
+| GitHub updated but website unchanged | Republish the latest application version                    |
 
-## Deployment verification
+## Deployment Verification Checklist
 
-- [ ] Published link opens without a login
-- [ ] Video playback works
+- [ ] Website opens publicly
+- [ ] YouTube video playback works
 - [ ] Transcript retrieval works
-- [ ] Tutor answers a real question (currently needs re-test)
-- [ ] Timestamp citations checked against video (needs re-test)
-- [ ] No credentials committed to GitHub
-- [ ] Source and deployment represent the same build
+- [ ] AI Tutor responds successfully
+- [ ] Timestamp references are accurate
+- [ ] API credentials are securely stored
+- [ ] GitHub repository contains the latest source code
 
-**Current status:** The user reported a working published site and GitHub source repository. AI Tutor runtime failed after Lovable Gateway credits were exhausted; Gemini integration is being debugged. Re-test before declaring the deployed application fully functional.
+## Current Project Status
+
+LearnFlow AI has a published web application and a public GitHub repository.
+
+The application includes YouTube video integration, transcript retrieval, and an AI-assisted learning interface.
+
+The AI Tutor previously encountered runtime credit limitations. The Gemini API migration requires successful testing before the tutor can be considered fully operational.
+
+**Live Application:** [https://learn-aii-tutor.lovable.app/](https://learn-aii-tutor.lovable.app/)
+
+**Source Code:** [https://github.com/jashan19092007/learn-aii-tutor](https://github.com/jashan19092007/learn-aii-tutor)
